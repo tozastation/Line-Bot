@@ -25,8 +25,12 @@ def hello_world():
 
 @app.route('/send')
 def send_morning():
+    user_ids = []
+    for user_id in model.Get_Text.select():
+        user_ids.append(user_id)
+
     try:
-        line_bot_api.push_message('<to>',
+        line_bot_api.push_message(user_ids,
                                   TextSendMessage(text='Hello World!')
                                   )
     except LineBotApiError as e:
