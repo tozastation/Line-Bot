@@ -1,4 +1,4 @@
-from flask import Flask, request, abort, g
+from flask import Flask, request, abort
 from linebot import (
     LineBotApi, WebhookHandler
 )
@@ -17,7 +17,7 @@ import json
 app = Flask(__name__)
 line_bot_api = LineBotApi(settings.YOUR_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(settings.YOUR_CHANNEL_SECRET)
-g.context = ""
+
 
 @app.route('/')
 def hello_world():
@@ -72,8 +72,6 @@ def handle_message(event):
     s = requests.session()
     r = s.post(url, data=json.dumps(payload))
     res_json = json.loads(r.text)
-    # g.context = res_json['context']
-    # sentence = str(res_json['utt'])+'by'+ event.course.type
     line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(text=str(res_json['utt']))
