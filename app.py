@@ -44,7 +44,7 @@ def handle_message(event):
     sentence = event.message.text
     try:
         with model.db.transaction():
-            talk = model.Get_Text(sentence_id=model.Get_Text.count() + 1, sentence=sentence)
+            talk = model.Get_Text(sentence_id=1, sentence=sentence)
             talk.save()
         model.db.commit()
     except Exception as e:
