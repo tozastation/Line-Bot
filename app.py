@@ -1,4 +1,4 @@
-from flask import Flask, request, abort
+from flask import Flask, request, abort, g
 from linebot import (
     LineBotApi, WebhookHandler
 )
@@ -10,11 +10,13 @@ from linebot.models import (
 )
 import settings
 import model
-
+import requests
+import json
 app = Flask(__name__)
 
 line_bot_api = LineBotApi(settings.YOUR_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(settings.YOUR_CHANNEL_SECRET)
+g.context = ""
 
 @app.route('/')
 def hello_world():
@@ -50,11 +52,25 @@ def handle_message(event):
     except Exception as e:
         print(e)
     # send a message
+    payload = {
+        "utt": event.message.text,
+        "context": g.context,
+        "place": "北海道",
+        "mode": "srtr"
+    }
+    KEY = '2f42326a4d52784249447133356f656338317a3373464a4c4d6c73506a462f72574331687568694a637641'
+    endpoint = 'https://api.apigw.smt.docomo.ne.jp/dialogue/v1/dialogue?APIKEY=REGISTER_KEY'
+    url = endpoint.replace('REGISTER_KEY', KEY)
+    s = requests.session()
+    r = s.post(url, data=json.dumps(payload))
+    res_json = json.loads(r.text)
+    g.context = res_json['context']
+    sentence = str(res_json['utt'])+'by'+str(event.course.type)
     line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage(text=event.message.text)
+        TextSendMessage(text=sentence)
     )
-    """
+
     payload = {
         "utt": event.message.text,
         "context": "",
@@ -69,7 +85,7 @@ def handle_message(event):
     res_json = json.loads(r.text)
     # g.context = res_json['context']
     # sentence = str(res_json['utt'])+str(event.course.type)
-    """
+
 
 
 
