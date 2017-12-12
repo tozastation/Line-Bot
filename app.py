@@ -39,8 +39,8 @@ def send_morning():
     weather = data["weather"][0]["main"]
     sentence1 = "おはよううさ。今日の天気うさ!!今日も一日頑張るうさ!!!!\nうるさ!!!!\n"
     sentence2 = 'City : ' + str(city) + '\n'
-    sentence3 = 'temp : ' + str(temp) + '\n'
-    sentence4 = 'weather : ' + str(weather)
+    sentence3 = 'Temp : ' + str(temp) + '\n'
+    sentence4 = 'Weather : ' + str(weather)
     sentence = sentence1 + sentence2 + sentence3 + sentence4
     with model.db.transaction():
         for user in model.Get_Text.select():
@@ -77,10 +77,15 @@ def callback():
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     # connect to database
+    flag = False
     try:
         model.db.create_tables([model.Get_Text], safe=True)
         with model.db.transaction():
-            model.Get_Text.create(user_id=event.source.user_id)
+            for user in model.Get_Text.select():
+                if user.user_id is event.source.user_id:
+                    flag = True
+            if not(flag):
+                model.Get_Text.create(user_id=event.source.user_id)
         model.db.commit()
     except Exception as e:
         print(e)
