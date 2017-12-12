@@ -29,15 +29,16 @@ def send_morning():
     user_ids = []
     with model.db.transaction():
         for user in model.Get_Text.select():
-            user_ids.append(user.user_id)
+            try:
+                line_bot_api.push_message(user.user_id,
+                                          TextSendMessage(text='Hello World!')
+                                          )
+            except LineBotApiError as e:
+                    print(e)
     model.db.commit()
 
-    try:
-        line_bot_api.push_message(user_ids[0],
-                                  TextSendMessage(text='Hello World!')
-                                  )
-    except LineBotApiError as e:
-        print(e)
+    
+
 
 
 @app.route("/callback", methods=['POST'])
