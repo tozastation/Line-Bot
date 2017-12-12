@@ -13,6 +13,6 @@ class BaseModel(peewee.Model):
         database = db
 
 
-class Get_Text(BaseModel):
+class get_user_id(BaseModel):
     user_id = peewee.CharField(null=True)
 

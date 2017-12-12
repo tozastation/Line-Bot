@@ -43,7 +43,7 @@ def send_morning():
     sentence4 = 'Weather : ' + str(weather)
     sentence = sentence1 + sentence2 + sentence3 + sentence4
     with model.db.transaction():
-        for user in model.Get_Text.select():
+        for user in model.get_user_id.select():
             try:
                 line_bot_api.push_message(user.user_id,
                                           TextSendMessage(text=sentence)
@@ -79,13 +79,13 @@ def handle_message(event):
     # connect to database
     flag = False
     try:
-        model.db.create_tables([model.Get_Text], safe=True)
+        model.db.create_tables([model.get_user_id], safe=True)
         with model.db.transaction():
-            for user in model.Get_Text.select():
+            for user in model.get_user_id.select():
                 if user.user_id is event.source.user_id:
                     flag = True
-            if not(flag):
-                model.Get_Text.create(user_id=event.source.user_id)
+            if flag==False:
+                model.get_user_id.create(user_id=event.source.user_id)
         model.db.commit()
     except Exception as e:
         print(e)
