@@ -44,11 +44,10 @@ def callback():
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    sentence = event.message.text
     try:
         model.db.create_tables([model.Get_Text], safe=True)
         with model.db.transaction():
-            model.Get_Text.create(sentence_id=1, sentence=sentence)
+            model.Get_Text.create(sentence=TextMessage)
         model.db.commit()
     except Exception as e:
         print(e)
