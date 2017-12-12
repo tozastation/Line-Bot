@@ -57,12 +57,6 @@ def handle_message(event):
     payload = {
         "utt": event.message.text,
         "context": g.context,
-        "nickname": event.source.type,
-        "birthdateY": "1997",
-        "birthdateM": "11",
-        "birthdateD": "5",
-        "age": "20",
-        "constellations": "蠍座",
         "place": "北海道",
         "mode": "srtr"
     }
@@ -73,9 +67,10 @@ def handle_message(event):
     r = s.post(url, data=json.dumps(payload))
     res_json = json.loads(r.text)
     g.context = res_json['context']
+    sentence = str(res_json['utt'])+str(event.course.type)
     line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage(text=str(res_json['utt']))
+        TextSendMessage(text=sentence)
     )
 
 
