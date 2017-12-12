@@ -37,10 +37,10 @@ def send_morning():
     city = data['name']
     temp = round(data['main']['temp'] - K, 2)
     weather = data["weather"][0]["main"]
-    sentence1 = "おはよううさ。今日の天気うさ。\n"
-    sentence2 = 'City :' + str(city) + '\n'
-    sentence3 = 'temp :' + str(temp) + '\n'
-    sentence4 = 'weather :' + str(weather) + '\n'
+    sentence1 = "おはよううさ。今日の天気うさ!!今日も一日頑張るうさ!!!!\nうるさ!!!!\n"
+    sentence2 = 'City : ' + str(city) + '\n'
+    sentence3 = 'temp : ' + str(temp) + '\n'
+    sentence4 = 'weather : ' + str(weather)
     sentence = sentence1 + sentence2 + sentence3 + sentence4
     with model.db.transaction():
         for user in model.Get_Text.select():
