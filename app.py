@@ -1,4 +1,4 @@
-from flask import Flask, request, abort
+from flask import Flask, request, abort, jsonify
 app = Flask(__name__)
 from linebot import (
     LineBotApi, WebhookHandler
@@ -45,7 +45,7 @@ def handle_message(event):
     line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(text=event.message.text))
-    print(sentence)
+    return jsonify(sentence)
 
 
 if __name__ == '__main__':
