@@ -17,12 +17,3 @@ class Get_Text(BaseModel):
     sentence_id = peewee.IntegerField()
     body = peewee.TextField()
 
-
-def InitializeDatabase():
-    db.drop_tables([Get_Text], safe=True)
-    db.create_tables([Get_Text], safe=True)
-    db.commit()
-
-
-if __name__ == '__main__':
-    InitializeDatabase(debug=True)

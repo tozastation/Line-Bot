@@ -46,6 +46,7 @@ def callback():
 def handle_message(event):
     sentence = event.message.text
     try:
+        model.db.create_tables([model.Get_Text], safe=True)
         with model.db.transaction():
             talk = model.Get_Text(sentence_id=1, sentence=sentence)
             talk.save()
