@@ -68,26 +68,8 @@ def handle_message(event):
     # sentence = str(res_json['utt'])+'by'+str(event.course.type)
     line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage(text=res_json['utt'])
+        TextSendMessage(text=str(res_json['utt']))
     )
-
-    payload = {
-        "utt": event.message.text,
-        "context": "",
-        "place": "北海道",
-        "mode": "dialog"
-    }
-    KEY = '2f42326a4d52784249447133356f656338317a3373464a4c4d6c73506a462f72574331687568694a637641'
-    endpoint = 'https://api.apigw.smt.docomo.ne.jp/dialogue/v1/dialogue?APIKEY=REGISTER_KEY'
-    url = endpoint.replace('REGISTER_KEY', KEY)
-    s = requests.session()
-    r = s.post(url, data=json.dumps(payload))
-    res_json = json.loads(r.text)
-    # g.context = res_json['context']
-    # sentence = str(res_json['utt'])+str(event.course.type)
-
-
-
 
 
 if __name__ == '__main__':
