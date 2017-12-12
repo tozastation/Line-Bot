@@ -1,5 +1,4 @@
 from flask import Flask, request, abort, jsonify
-app = Flask(__name__)
 from linebot import (
     LineBotApi, WebhookHandler
 )
@@ -9,11 +8,12 @@ from linebot.exceptions import (
 from linebot.models import (
     MessageEvent, TextMessage, TextSendMessage,
 )
-from settings import *
+import settings
+import model
+app = Flask(__name__)
 
-
-line_bot_api = LineBotApi(YOUR_CHANNEL_ACCESS_TOKEN)
-handler = WebhookHandler(YOUR_CHANNEL_SECRET)
+line_bot_api = LineBotApi(settings.YOUR_CHANNEL_ACCESS_TOKEN)
+handler = WebhookHandler(settings.YOUR_CHANNEL_SECRET)
 
 
 @app.route('/')
@@ -42,10 +42,18 @@ def callback():
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     sentence = event.message.text
+    try:
+        with model.db.transaction():
+            talk = model.Get_Text(sentence_id=model.Get_Text.count() + 1, sentence=sentence)
+            talk.save()
+        model.db.commit()
+    except Exception as e:
+        print(e)
+        model.db.rollback()
     line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(text=event.message.text))
-    return jsonify(sentence)
+
 
 
 if __name__ == '__main__':
