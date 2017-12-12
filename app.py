@@ -54,6 +54,7 @@ def handle_message(event):
     except Exception as e:
         print(e)
     # send a message
+    """
     payload = {
         "utt": event.message.text,
         "context": "",
@@ -68,9 +69,10 @@ def handle_message(event):
     res_json = json.loads(r.text)
     # g.context = res_json['context']
     # sentence = str(res_json['utt'])+str(event.course.type)
+    """
     line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage(text=res_json['utt'])
+        TextSendMessage(text=event.message.text)
     )
 
 
