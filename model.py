@@ -14,6 +14,5 @@ class BaseModel(peewee.Model):
 
 
 class Get_Text(BaseModel):
-    sentence_id = peewee.IntegerField()
     body = peewee.TextField()
 
