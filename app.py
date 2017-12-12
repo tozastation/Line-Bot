@@ -23,7 +23,7 @@ handler = WebhookHandler(settings.YOUR_CHANNEL_SECRET)
 def hello_world():
     return 'Hello World!'
 
-@app.route('/send', methods=['POST'])
+@app.route('/send', methods=['GET'])
 def send_morning():
     user_ids = []
     for user_id in model.Get_Text.select():
