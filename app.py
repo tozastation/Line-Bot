@@ -23,11 +23,14 @@ handler = WebhookHandler(settings.YOUR_CHANNEL_SECRET)
 def hello_world():
     return 'Hello World!'
 
-@app.route('/send', methods=['GET'])
+
+@app.route('/send')
 def send_morning():
     user_ids = []
-    for user_id in model.Get_Text.select():
-        user_ids.append(user_id.user_id)
+    with model.db.transaction():
+        for user in model.Get_Text.select():
+            user_ids.append(user.user_id)
+    model.db.commit()
 
     try:
         line_bot_api.push_message(user_ids,
