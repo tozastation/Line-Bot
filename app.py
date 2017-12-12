@@ -26,18 +26,20 @@ def hello_world():
 
 @app.route('/send')
 def send_morning():
-    user_ids = []
+    url = 'http://weather.livedoor.com/forecast/webservice/json/v1'
+    payload = {'city': '017010'}
+    data = requests.get(url, params=payload).json()
     with model.db.transaction():
         for user in model.Get_Text.select():
             try:
                 line_bot_api.push_message(user.user_id,
-                                          TextSendMessage(text='Hello World!')
+                                          TextSendMessage(text=data)
                                           )
             except LineBotApiError as e:
                     print(e)
     model.db.commit()
 
-    
+
 
 
 
