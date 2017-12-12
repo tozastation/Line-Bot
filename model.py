@@ -14,5 +14,5 @@ class BaseModel(peewee.Model):
 
 
 class Get_Text(BaseModel):
-    body = peewee.TextField(null=True)
+    body = peewee.CharField(null=True)
 
