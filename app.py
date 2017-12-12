@@ -33,7 +33,7 @@ def send_morning():
     model.db.commit()
 
     try:
-        line_bot_api.push_message(user_ids,
+        line_bot_api.push_message(user_ids[0],
                                   TextSendMessage(text='Hello World!')
                                   )
     except LineBotApiError as e:
