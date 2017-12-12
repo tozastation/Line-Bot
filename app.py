@@ -57,7 +57,7 @@ def handle_message(event):
     try:
         model.db.create_tables([model.Get_Text], safe=True)
         with model.db.transaction():
-            model.Get_Text.create(body=event.source.userId)
+            model.Get_Text.create(body=event.Source.UserID)
         model.db.commit()
     except Exception as e:
         print(e)
