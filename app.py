@@ -82,7 +82,7 @@ def handle_message(event):
         model.db.create_tables([model.get_user_id], safe=True)
         with model.db.transaction():
             for user in model.get_user_id.select():
-                if user.user_id is event.source.user_id:
+                if user.user_id == event.source.user_id:
                     flag = True
             if flag==False:
                 model.get_user_id.create(user_id=event.source.user_id)
