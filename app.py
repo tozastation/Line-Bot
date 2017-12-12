@@ -1,4 +1,4 @@
-from flask import Flask, request, abort, jsonify, g
+from flask import Flask, request, abort
 from linebot import (
     LineBotApi, WebhookHandler
 )
@@ -10,15 +10,11 @@ from linebot.models import (
 )
 import settings
 import model
-import psycopg2
-import requests
-import json
 
 app = Flask(__name__)
 
 line_bot_api = LineBotApi(settings.YOUR_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(settings.YOUR_CHANNEL_SECRET)
-g.context = ""
 
 @app.route('/')
 def hello_world():
@@ -54,6 +50,10 @@ def handle_message(event):
     except Exception as e:
         print(e)
     # send a message
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text=event.message.text)
+    )
     """
     payload = {
         "utt": event.message.text,
@@ -70,10 +70,7 @@ def handle_message(event):
     # g.context = res_json['context']
     # sentence = str(res_json['utt'])+str(event.course.type)
     """
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text=event.message.text)
-    )
+
 
 
 
