@@ -64,7 +64,7 @@ def handle_message(event):
         "age": "20",
         "constellations": "蠍座",
         "place": "北海道",
-        "mode": "dialog"
+        "mode": "srtr"
     }
     KEY = '2f42326a4d52784249447133356f656338317a3373464a4c4d6c73506a462f72574331687568694a637641'
     endpoint = 'https://api.apigw.smt.docomo.ne.jp/dialogue/v1/dialogue?APIKEY=REGISTER_KEY'
