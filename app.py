@@ -76,7 +76,7 @@ def handle_message(event):
     # sentence = str(res_json['utt'])+'by'+ event.course.type
     line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage(text=res_json['utt'])
+        TextSendMessage(text=str(res_json['utt']))
     )
 
 
