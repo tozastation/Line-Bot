@@ -10,6 +10,9 @@ from linebot.models import (
 )
 import settings
 import model
+import psycopg2
+
+
 app = Flask(__name__)
 
 line_bot_api = LineBotApi(settings.YOUR_CHANNEL_ACCESS_TOKEN)
