@@ -12,11 +12,12 @@ import settings
 import model
 import requests
 import json
-app = Flask(__name__)
 
+
+app = Flask(__name__)
 line_bot_api = LineBotApi(settings.YOUR_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(settings.YOUR_CHANNEL_SECRET)
-g.context = ""
+
 
 @app.route('/')
 def hello_world():
@@ -38,7 +39,7 @@ def callback():
     except InvalidSignatureError:
         abort(400)
 
-    return 'OK'
+    return 'OK\n'
 
 
 @handler.add(MessageEvent, message=TextMessage)
@@ -55,6 +56,15 @@ def handle_message(event):
     payload = {
         "utt": event.message.text,
         "context": "",
+        "nickname": "",
+        "nickname_y": "",
+        "sex": "",
+        "bloodtype": "",
+        "birthdateY": "",
+        "birthdateM": "",
+        "birthdateD": "",
+        "age": "",
+        "constellations": "",
         "place": "北海道",
         "mode": "dialog"
     }
