@@ -1,4 +1,4 @@
-from flask import Flask, request, abort, jsonify
+from flask import Flask, request, abort, jsonify, g
 from linebot import (
     LineBotApi, WebhookHandler
 )
@@ -18,7 +18,7 @@ app = Flask(__name__)
 
 line_bot_api = LineBotApi(settings.YOUR_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(settings.YOUR_CHANNEL_SECRET)
-
+g.context = ""
 
 @app.route('/')
 def hello_world():
@@ -56,7 +56,7 @@ def handle_message(event):
     # send a message
     payload = {
         "utt": event.message.text,
-        "context": "",
+        "context": g.context,
         "nickname": event.source.type,
         "birthdateY": "1997",
         "birthdateM": "11",
@@ -64,7 +64,7 @@ def handle_message(event):
         "age": "20",
         "constellations": "蠍座",
         "place": "北海道",
-        "mode": "dialog",
+        "mode": "dialog"
     }
     KEY = '2f42326a4d52784249447133356f656338317a3373464a4c4d6c73506a462f72574331687568694a637641'
     endpoint = 'https://api.apigw.smt.docomo.ne.jp/dialogue/v1/dialogue?APIKEY=REGISTER_KEY'
@@ -72,6 +72,7 @@ def handle_message(event):
     s = requests.session()
     r = s.post(url, data=json.dumps(payload))
     res_json = json.loads(r.text)
+    g.context = res_json['context']
     line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(text=str(res_json['utt']))
