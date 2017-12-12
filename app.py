@@ -48,12 +48,10 @@ def handle_message(event):
     try:
         model.db.create_tables([model.Get_Text], safe=True)
         with model.db.transaction():
-            talk = model.Get_Text(sentence_id=1, sentence=sentence)
-            talk.save()
+            model.Get_Text.create(sentence_id=1, sentence=sentence)
         model.db.commit()
     except Exception as e:
         print(e)
-        model.db.rollback()
     line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(text=event.message.text))
