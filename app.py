@@ -27,7 +27,7 @@ def hello_world():
 def send_morning():
     user_ids = []
     for user_id in model.Get_Text.select():
-        user_ids.append(user_id)
+        user_ids.append(user_id.user_id)
 
     try:
         line_bot_api.push_message(user_ids,
