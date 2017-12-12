@@ -68,7 +68,7 @@ def handle_message(event):
         "place": "北海道",
         "mode": "dialog"
     }
-    url = settings.endpoint.replace('REGISTER_KEY', settings.KEY)
+    url = settings.endpoint+settings.KEY
     s = requests.session()
     r = s.post(url, data=json.dumps(payload))
     res_json = json.loads(r.text)
