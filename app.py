@@ -42,8 +42,26 @@ def send_morning():
     return 'Complete to Send\n'
 
 
-@app.route('/nikoniko')
-def send_nikoniko():
+@app.route('/nikoniko/news')
+def send_nikoniko_news():
+    niko = Niko()
+    titles = niko.send_news_title()
+    links = niko.send_news_link()
+    with db.transaction():
+        for user in UserInfomation.select():
+            for i in range(0, 5):
+                try:
+                    line_bot_api.push_message(user.user_id,
+                                              TextSendMessage(text=titles[i] + '\n' + links[i]))
+                except LineBotApiError as e:
+                    print(e)
+    db.commit()
+    return 'Complete to Send\n'
+
+
+# send a today's ranking
+@app.route('/nikoniko/douga')
+def send_nikoniko_douga():
     niko = Niko()
     titles = niko.send_ranking_title()
     links = niko.send_ranking_link()
@@ -53,11 +71,10 @@ def send_nikoniko():
                 try:
                     line_bot_api.push_message(user.user_id,
                                               TextSendMessage(text=titles[i]+'\n'+links[i]))
-
                 except LineBotApiError as e:
                     print(e)
     db.commit()
-    return 'Complete to Send'
+    return 'Complete to Send\n'
 
 
 @app.route("/callback", methods=['POST'])
@@ -146,7 +163,7 @@ def handle_message(event):
         r = s.post(url, data=json.dumps(payload))
         res_json = json.loads(r.text)
         user = UserInfomation.get(UserInfomation.user_id == user_id)
-        dear = 'なんだうさ。'+user.user_name+'さん\n'
+        dear = 'なんだうさ。'+user.user_name+'さん。\n'
         reply = dear+str(res_json['utt'])
         with db.transaction():
             LogInfomation.create(log_text=user_text,

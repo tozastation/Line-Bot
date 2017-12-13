@@ -52,20 +52,23 @@ class Push(object):
         line2 = 'City : ' + str(city) + '\n'
         line3 = 'temp : ' + str(temp) + '\n'
         line4 = 'weather : ' + str(weather) + '\n'
-        line5 = 'description : ' + str(description)
-        sentence = line1 + line2 + line3 + line4 + line5
+        line5 = 'description : ' + str(description)+ '\n'
+        line6 = '気をつけて行くうさよ。'
+        sentence = line1 + line2 + line3 + line4 + line5+ line6
         return sentence
 
 
 class Niko(object):
     def __init__(self):
-        self.url = 'http://www.nicovideo.jp/ranking/fav/hourly/sing?rss=2.0&lang=ja-jp'
+        self.url_ranking = 'http://www.nicovideo.jp/ranking/fav/hourly/sing?rss=2.0&lang=ja-jp'
+        self.url_news = 'http://news.nicovideo.jp/categories/10?rss=2.0'
 
     def send_ranking_link(self):
-        response = urllib.request.urlopen(self.url)
+        response = urllib.request.urlopen(self.url_ranking)
         root = ElementTree.fromstring(response.read())
         document = md.parseString(ElementTree.tostring(root, 'utf-8'))
         links = []
+
         for a in document.getElementsByTagName('link'):
             links.append(a.toxml().rstrip('</link>').lstrip('</link>'))
 
@@ -75,10 +78,38 @@ class Niko(object):
         return links
 
     def send_ranking_title(self):
-        response = urllib.request.urlopen(self.url)
+        response = urllib.request.urlopen(self.url_ranking)
         root = ElementTree.fromstring(response.read())
         document = md.parseString(ElementTree.tostring(root, 'utf-8'))
         titles = []
+
+        for a in document.getElementsByTagName('title'):
+            titles.append(a.toxml().rstrip('</title>').lstrip('</title>'))
+
+        del titles[0]
+        titles.insert(0, '')
+        return titles
+
+
+    def send_news_link(self):
+        response = urllib.request.urlopen(self.url_news)
+        root = ElementTree.fromstring(response.read())
+        document = md.parseString(ElementTree.tostring(root, 'utf-8'))
+        links = []
+
+        for a in document.getElementsByTagName('link'):
+            links.append(a.toxml().rstrip('</link>').lstrip('</link>'))
+
+        del links[0]
+        links.insert(0, 'この時間のニュースうさ')
+        return links
+
+    def send_news_title(self):
+        response = urllib.request.urlopen(self.url_news)
+        root = ElementTree.fromstring(response.read())
+        document = md.parseString(ElementTree.tostring(root, 'utf-8'))
+        titles = []
+
         for a in document.getElementsByTagName('title'):
             titles.append(a.toxml().rstrip('</title>').lstrip('</title>'))
 

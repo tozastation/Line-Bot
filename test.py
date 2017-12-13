@@ -29,21 +29,24 @@ if '@' in sentence:
 import urllib
 from xml.etree import ElementTree
 import xml.dom.minidom as md
-url = 'http://www.nicovideo.jp/ranking/fav/hourly/sing?rss=2.0&lang=ja-jp'
+url = 'http://news.nicovideo.jp/categories/10?rss=2.0'
 response = urllib.request.urlopen(url)
 root = ElementTree.fromstring(response.read())
 document = md.parseString(ElementTree.tostring(root, 'utf-8'))
-text = document.toprettyxml(indent="  ")
 links = []
-titles = []
 for a in document.getElementsByTagName('link'):
     links.append(a.toxml().rstrip('</link>').lstrip('</link>'))
+del links[0]
+links.insert(0, 'この時間のニュースうさ')
+for link in links:
+    print(link)
+
+titles = []
 
 for a in document.getElementsByTagName('title'):
     titles.append(a.toxml().rstrip('</title>').lstrip('</title>'))
 
-del links[0]
 del titles[0]
-for i in range(0,3):
-    print(titles[i]+'\n'+links[i])
-
+titles.insert(0, '')
+for title in titles:
+    print(title)
