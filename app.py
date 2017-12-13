@@ -112,7 +112,7 @@ def handle_message(event):
         s = requests.session()
         r = s.post(url, data=json.dumps(payload))
         res_json = json.loads(r.text)
-        user = UserInfomation.select().where(UserInfomation.user_id == user_id)
+        user = UserInfomation.get(UserInfomation.user_id == user_id)
         dear = 'なんだうさ'+user.user_name+'。'
         reply = dear+str(res_json['utt'])
         with db.transaction():
