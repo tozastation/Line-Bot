@@ -35,8 +35,7 @@ def send_morning():
         for user in get_user_id.select():
             try:
                 line_bot_api.push_message(user.user_id,
-                                          TextSendMessage(text=sentence)
-                                          )
+                                          TextSendMessage(text=sentence))
             except LineBotApiError as e:
                     print(e)
     db.commit()
@@ -100,14 +99,19 @@ def handle_message(event):
     res_json = json.loads(r.text)
     reply = str(res_json['utt'])
     with db.transaction():
-        LogInfomation.create(log_text=event.message.text, log_owner=event.source.user_id, log_status='Receive')
-        LogInfomation.create(log_text=reply, log_owner='Bot', log_status='Reply', log_time=datetime.datetime.today())
+        LogInfomation.create(log_text=event.message.text,
+                             log_owner=event.source.user_id,
+                             log_status='Receive',
+                             log_time = datetime.datetime.today())
+        LogInfomation.create(log_text=reply,
+                             log_owner='Bot',
+                             log_status='Reply',
+                             log_time=datetime.datetime.today())
     db.commit()
 
     line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage(text=reply)
-    )
+        TextSendMessage(text=reply))
 
 
 if __name__ == '__main__':
