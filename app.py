@@ -64,6 +64,7 @@ def handle_message(event):
     # Create Table
     duplication_flag = False
     user_name_flag = '@'
+    log_flag = 'ls'
     db.create_tables([UserInfomation], safe=True)
     db.create_tables([LogInfomation], safe=True)
     user_id = event.source.user_id
@@ -87,8 +88,16 @@ def handle_message(event):
         db.commit()
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text='登録したうさ')
+            TextSendMessage(text='登録したうさよ')
         )
+    elif log_flag in user_text:
+        text = []
+        for log in LogInfomation.select().where(UserInfomation.user_id == user_id):
+           text.append(log.log_text)
+
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=text))
     # reply a message
     else:
         payload = {
@@ -113,7 +122,7 @@ def handle_message(event):
         r = s.post(url, data=json.dumps(payload))
         res_json = json.loads(r.text)
         user = UserInfomation.get(UserInfomation.user_id == user_id)
-        dear = 'なんだうさ'+user.user_name+'\n'
+        dear = 'なんだうさ。'+user.user_name+'さん\n'
         reply = dear+str(res_json['utt'])
         with db.transaction():
             LogInfomation.create(log_text=user_text,
