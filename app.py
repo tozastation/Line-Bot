@@ -82,11 +82,12 @@ def handle_message(event):
     if user_name_flag in user_text:
         with db.transaction():
             user_name = user_text.replace(user_name_flag, '')
-            UserInfomation.update(user_name=user_name).where(UserInfomation.user_id == user_id)
+            query = UserInfomation.update(user_name=user_name).where(UserInfomation.user_id == user_id)
+            query.execute()
         db.commit()
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text='登録したうさ\n')
+            TextSendMessage(text='登録したうさ')
         )
     # reply a message
     else:
