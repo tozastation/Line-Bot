@@ -93,8 +93,10 @@ def handle_message(event):
     elif log_flag in user_text:
         text = ''
         with db.transaction():
+            count = 0
             for log in LogInfomation.select().where(LogInfomation.log_owner == user_id):
-                text+=(log.log_text+'\n')
+                count+=1
+                text+=(str(count)+':'+log.log_text+str(log.log_time)+'\n')
         db.commit()
 
         line_bot_api.reply_message(
