@@ -1,4 +1,4 @@
-from flask import Flask, request, abort, g
+from flask import Flask, request, abort
 from linebot import (
     LineBotApi, WebhookHandler
 )
@@ -8,16 +8,16 @@ from linebot.exceptions import (
 from linebot.models import (
     MessageEvent, TextMessage, TextSendMessage,
 )
-import settings
-import model
+from settings import Info, Push
+from model import *
 import requests
 import json
 
 
 app = Flask(__name__)
-g.info = settings.Info()
-YOUR_CHANNEL_ACCESS_TOKEN = g.info.get_YCAT()
-YOUR_CHANNEL_SECRET = g.info.get_YCS()
+info = Info()
+YOUR_CHANNEL_ACCESS_TOKEN = info.get_YCAT()
+YOUR_CHANNEL_SECRET = info.get_YCS()
 line_bot_api = LineBotApi(YOUR_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(YOUR_CHANNEL_SECRET)
 
@@ -29,19 +29,18 @@ def hello_world():
 
 @app.route('/send')
 def send_morning():
-    push_man = settings.Push()
+    push_man = Push()
     sentence = push_man.morning_information()
-
-    with model.db.transaction():
-        for user in model.get_user_id.select():
+    with db.transaction():
+        for user in get_user_id.select():
             try:
                 line_bot_api.push_message(user.user_id,
                                           TextSendMessage(text=sentence)
                                           )
             except LineBotApiError as e:
                     print(e)
-    model.db.commit()
-    return 'Complete to Send'
+    db.commit()
+    return 'Complete to Send\n'
 
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -67,14 +66,14 @@ def handle_message(event):
     # insert user_id
     duplication_flag = False
     try:
-        model.db.create_tables([model.UserInfomation], safe=True)
-        with model.db.transaction():
-            for user in model.UserInfomation.select():
+        db.create_tables([UserInfomation], safe=True)
+        with db.transaction():
+            for user in UserInfomation.select():
                 if user.user_id in event.source.user_id:
                     duplication_flag = True
             if duplication_flag is False:
-                model.UserInfomation.create(user_id=event.source.user_id)
-        model.db.commit()
+                UserInfomation.create(user_id=event.source.user_id)
+        db.commit()
     except Exception as e:
         print(e)
     # send a message
@@ -93,8 +92,8 @@ def handle_message(event):
         "place": "北海道",
         "mode": "dialog"
     }
-    endpoint = g.info.get_endpoint()
-    KEY = g.info.get_KEY()
+    endpoint = info.get_endpoint()
+    KEY = info.get_KEY()
     url = endpoint+KEY
     s = requests.session()
     r = s.post(url, data=json.dumps(payload))

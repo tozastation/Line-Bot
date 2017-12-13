@@ -29,6 +29,7 @@ class Info(object):
     def get_api(self):
         return self.__api
 
+
 class Push(object):
     def morning_information(self):
         info = Info()
