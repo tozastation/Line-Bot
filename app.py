@@ -63,55 +63,69 @@ def callback():
 def handle_message(event):
     # Create Table
     duplication_flag = False
+    user_name_flag = '@'
     db.create_tables([UserInfomation], safe=True)
     db.create_tables([LogInfomation], safe=True)
+    user_id = event.source.user_id
+    user_text = event.message.text
     # Insert User_ID
     with db.transaction():
         for user in UserInfomation.select():
-            if user.user_id in event.source.user_id:
+            if user.user_id in user_id:
                 duplication_flag = True
 
         if duplication_flag is False:
-            UserInfomation.create(user_id=event.source.user_id)
+            UserInfomation.create(user_id=user_id)
 
     db.commit()
+    # add user_name
+    if user_name_flag in user_text:
+        with db.transaction():
+            user_name = user_text.replace(user_name_flag, '')
+            UserInfomation.update(user_name=user_name).where(UserInfomation.user_id in user_id)
+        db.commit()
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text='登録したうさ\n')
+        )
     # reply a message
-    payload = {
-        "utt": event.message.text,
-        "context": "",
-        "nickname": "",
-        "nickname_y": "",
-        "sex": "",
-        "bloodtype": "",
-        "birthdateY": "",
-        "birthdateM": "",
-        "birthdateD": "",
-        "age": "",
-        "constellations": "",
-        "place": "北海道",
-        "mode": "dialog"
-    }
-    endpoint = info.get_endpoint() # API EndPoint
-    KEY = info.get_KEY() # API KEY
-    url = endpoint+KEY
-    s = requests.session()
-    r = s.post(url, data=json.dumps(payload))
-    res_json = json.loads(r.text)
-    reply = str(res_json['utt'])
-    with db.transaction():
-        LogInfomation.create(log_text=event.message.text,
-                             log_owner=event.source.user_id,
-                             log_status='Receive',
-                             log_time = datetime.datetime.today())
-        LogInfomation.create(log_text=reply,
-                             log_owner='Bot',
-                             log_status='Reply',
-                             log_time=datetime.datetime.today())
-    db.commit()
+    else:
+        payload = {
+            "utt": user_text,
+            "context": "",
+            "nickname": "",
+            "nickname_y": "",
+            "sex": "",
+            "bloodtype": "",
+            "birthdateY": "",
+            "birthdateM": "",
+            "birthdateD": "",
+            "age": "",
+            "constellations": "",
+            "place": "北海道",
+            "mode": "dialog"
+        }
+        endpoint = info.get_endpoint() # API EndPoint
+        KEY = info.get_KEY() # API KEY
+        url = endpoint+KEY
+        s = requests.session()
+        r = s.post(url, data=json.dumps(payload))
+        res_json = json.loads(r.text)
+        reply = str(res_json['utt'])
+        with db.transaction():
+            LogInfomation.create(log_text=user_text,
+                                 log_owner=user_id,
+                                 log_status='Receive',
+                                 log_time = datetime.datetime.today())
+            LogInfomation.create(log_text=reply,
+                                 log_owner='Bot',
+                                 log_status='Reply',
+                                 log_time=datetime.datetime.today())
+        db.commit()
 
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text=reply))
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=reply))
 
 
 if __name__ == '__main__':

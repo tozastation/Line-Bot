@@ -1,5 +1,7 @@
 import json
 import requests
+import re
+"""
 API_KEY = "b658161bac2942afc45703a43ff1b362"
 api = "http://api.openweathermap.org/data/2.5/weather?q={city}&APPID={key}"
 city_name = 'Hakodate'
@@ -20,3 +22,7 @@ line5 = 'description : '+str(description)
 sentence = line1+line2+line3+line4+line5
 print(sentence)
 print(data)
+"""
+sentence = '@tozasan'
+if '@' in sentence:
+    print(sentence.replace('@', ''))
