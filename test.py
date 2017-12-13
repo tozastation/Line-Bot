@@ -11,9 +11,12 @@ K = 273.15
 city = data['name']
 temp = round(data['main']['temp']-K,2)
 weather = data["weather"][0]["main"]
-sentence1 = "おはよううさ。今日の天気うさ。\n"
-sentence2 = 'City :'+str(city)+'\n'
-sentence3 = 'temp :'+str(temp)+'\n'
-sentence4 = 'weather :'+str(weather)+'\n'
-sentence = sentence1+sentence2+sentence3+sentence4
+description = data["weather"][0]["description"]
+line1 = "おはよううさ。今日の天気うさ。\n"
+line2 = 'City :'+str(city)+'\n'
+line3 = 'temp :'+str(temp)+'\n'
+line4 = 'weather :'+str(weather)+'\n'
+line5 = 'description : '+str(description)
+sentence = line1+line2+line3+line4+line5
 print(sentence)
+print(data)

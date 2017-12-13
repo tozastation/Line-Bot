@@ -1,4 +1,4 @@
-from flask import Flask, request, abort
+from flask import Flask, request, abort, g
 from linebot import (
     LineBotApi, WebhookHandler
 )
@@ -15,8 +15,11 @@ import json
 
 
 app = Flask(__name__)
-line_bot_api = LineBotApi(settings.YOUR_CHANNEL_ACCESS_TOKEN)
-handler = WebhookHandler(settings.YOUR_CHANNEL_SECRET)
+g.info = settings.Info()
+YOUR_CHANNEL_ACCESS_TOKEN = g.info.get_YCAT()
+YOUR_CHANNEL_SECRET = g.info.get_YCS()
+line_bot_api = LineBotApi(YOUR_CHANNEL_ACCESS_TOKEN)
+handler = WebhookHandler(YOUR_CHANNEL_SECRET)
 
 
 @app.route('/')
@@ -26,22 +29,9 @@ def hello_world():
 
 @app.route('/send')
 def send_morning():
-    API_KEY = "b658161bac2942afc45703a43ff1b362"
-    api = "http://api.openweathermap.org/data/2.5/weather?q={city}&APPID={key}"
-    city_name = 'Hakodate'
-    url = api.format(city=city_name, key=API_KEY)
-    print(url)
-    response = requests.get(url)
-    data = json.loads(response.text)
-    K = 273.15
-    city = data['name']
-    temp = round(data['main']['temp'] - K, 2)
-    weather = data["weather"][0]["main"]
-    sentence1 = "おはよううさ。今日の天気うさ!!今日も一日頑張るうさ!!!!\nうるさ!!!!\n"
-    sentence2 = 'City : ' + str(city) + '\n'
-    sentence3 = 'Temp : ' + str(temp) + '\n'
-    sentence4 = 'Weather : ' + str(weather)
-    sentence = sentence1 + sentence2 + sentence3 + sentence4
+    push_man = settings.Push()
+    sentence = push_man.morning_information()
+
     with model.db.transaction():
         for user in model.get_user_id.select():
             try:
@@ -51,10 +41,7 @@ def send_morning():
             except LineBotApiError as e:
                     print(e)
     model.db.commit()
-
-
-
-
+    return 'Complete to Send'
 
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -77,15 +64,16 @@ def callback():
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     # connect to database
-    flag = False
+    # insert user_id
+    duplication_flag = False
     try:
-        model.db.create_tables([model.get_user_id], safe=True)
+        model.db.create_tables([model.UserInfomation], safe=True)
         with model.db.transaction():
-            for user in model.get_user_id.select():
-                if user.user_id == event.source.user_id:
-                    flag = True
-            if flag==False:
-                model.get_user_id.create(user_id=event.source.user_id)
+            for user in model.UserInfomation.select():
+                if user.user_id in event.source.user_id:
+                    duplication_flag = True
+            if duplication_flag is False:
+                model.UserInfomation.create(user_id=event.source.user_id)
         model.db.commit()
     except Exception as e:
         print(e)
@@ -105,7 +93,9 @@ def handle_message(event):
         "place": "北海道",
         "mode": "dialog"
     }
-    url = settings.endpoint+settings.KEY
+    endpoint = g.info.get_endpoint()
+    KEY = g.info.get_KEY()
+    url = endpoint+KEY
     s = requests.session()
     r = s.post(url, data=json.dumps(payload))
     res_json = json.loads(r.text)

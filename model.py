@@ -16,3 +16,7 @@ class BaseModel(peewee.Model):
 class get_user_id(BaseModel):
     user_id = peewee.CharField(null=True)
 
+
+class UserInfomation(BaseModel):
+    user_id = peewee.TextField(null=True)
+    user_name = peewee.TextField(null=True)
