@@ -24,5 +24,5 @@ class UserInfomation(BaseModel):
 
 class LogInfomation(BaseModel):
     log_text = TextField(null=True)
-    log_owner = ForeignKeyField(UserInfomation, related_name='Users')
+    log_owner = TextField(null=True)
     log_status = TextField(null=True)

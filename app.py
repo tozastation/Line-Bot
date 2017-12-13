@@ -9,7 +9,7 @@ from linebot.models import (
     MessageEvent, TextMessage, TextSendMessage,
 )
 from settings import Info, Push
-from model import UserInfomation, LogInfomation, get_user_id, db
+from model import *
 import requests
 import json
 
@@ -71,8 +71,10 @@ def handle_message(event):
         for user in UserInfomation.select():
             if user.user_id in event.source.user_id:
                 duplication_flag = True
+
         if duplication_flag is False:
             UserInfomation.create(user_id=event.source.user_id)
+
     db.commit()
     # reply a message
     payload = {
@@ -96,13 +98,15 @@ def handle_message(event):
     s = requests.session()
     r = s.post(url, data=json.dumps(payload))
     res_json = json.loads(r.text)
+    reply = str(res_json['utt'])
     with db.transaction():
         LogInfomation.create(log_text=event.message.text, log_owner=event.source.user_id, log_status='Receive')
-        LogInfomation.create(log_text=str(res_json['utt']), log_owner='Bot', log_status='Reply')
+        LogInfomation.create(log_text=reply, log_owner='Bot', log_status='Reply')
     db.commit()
+
     line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage(text=str(res_json['utt']))
+        TextSendMessage(text=reply)
     )
 
 
