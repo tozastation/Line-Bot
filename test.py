@@ -35,9 +35,15 @@ root = ElementTree.fromstring(response.read())
 document = md.parseString(ElementTree.tostring(root, 'utf-8'))
 text = document.toprettyxml(indent="  ")
 links = []
+titles = []
 for a in document.getElementsByTagName('link'):
     links.append(a.toxml().rstrip('</link>').lstrip('</link>'))
 
+for a in document.getElementsByTagName('title'):
+    titles.append(a.toxml().rstrip('</title>').lstrip('</title>'))
+
 del links[0]
+del titles[0]
 for i in range(0,3):
-    print(links[i])
+    print(titles[i]+'\n'+links[i])
+

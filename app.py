@@ -45,13 +45,14 @@ def send_morning():
 @app.route('/nikoniko')
 def send_nikoniko():
     niko = Niko()
-    ranking = niko.send_ranking()
+    titles = niko.send_ranking_title()
+    links = niko.send_ranking_link()
     with db.transaction():
         for user in UserInfomation.select():
             for i in range(0,4):
                 try:
                     line_bot_api.push_message(user.user_id,
-                                              TextSendMessage(text=ranking[i]))
+                                              TextSendMessage(text=titles[i]+'\n'+links[i]))
 
                 except LineBotApiError as e:
                     print(e)

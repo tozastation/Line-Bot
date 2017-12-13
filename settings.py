@@ -61,15 +61,27 @@ class Niko(object):
     def __init__(self):
         self.url = 'http://www.nicovideo.jp/ranking/fav/hourly/sing?rss=2.0&lang=ja-jp'
 
-    def send_ranking(self):
+    def send_ranking_link(self):
         response = urllib.request.urlopen(self.url)
         root = ElementTree.fromstring(response.read())
         document = md.parseString(ElementTree.tostring(root, 'utf-8'))
         links = []
-
         for a in document.getElementsByTagName('link'):
             links.append(a.toxml().rstrip('</link>').lstrip('</link>'))
+
 
         del links[0]
         links.insert(0,'この時間のおすすめ動画うさ')
         return links
+
+    def send_ranking_title(self):
+        response = urllib.request.urlopen(self.url)
+        root = ElementTree.fromstring(response.read())
+        document = md.parseString(ElementTree.tostring(root, 'utf-8'))
+        titles = []
+        for a in document.getElementsByTagName('title'):
+            titles.append(a.toxml().rstrip('</title>').lstrip('</title>'))
+
+        del titles[0]
+        titles.insert(0, '')
+        return titles
