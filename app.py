@@ -113,7 +113,7 @@ def handle_message(event):
         r = s.post(url, data=json.dumps(payload))
         res_json = json.loads(r.text)
         user = UserInfomation.get(UserInfomation.user_id == user_id)
-        dear = 'なんだうさ'+user.user_name+'。'
+        dear = 'なんだうさ'+user.user_name+'\n'
         reply = dear+str(res_json['utt'])
         with db.transaction():
             LogInfomation.create(log_text=user_text,
