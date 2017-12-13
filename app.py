@@ -8,7 +8,7 @@ from linebot.exceptions import (
 from linebot.models import (
     MessageEvent, TextMessage, TextSendMessage,
 )
-from settings import Info, Push
+from settings import Info, Push, Niko
 from model import *
 import requests
 import json
@@ -40,6 +40,24 @@ def send_morning():
                     print(e)
     db.commit()
     return 'Complete to Send\n'
+
+
+@app.route('/nikoniko')
+def send_nikoniko():
+    niko = Niko()
+    ranking = niko.send_ranking()
+    with db.transaction():
+        for user in UserInfomation.select():
+            for i in range(0,4):
+                try:
+                    line_bot_api.push_message(user.user_id,
+                                              TextSendMessage(text=ranking[i]))
+
+                except LineBotApiError as e:
+                    print(e)
+    db.commit()
+    return 'Complete to Send'
+
 
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -90,6 +108,7 @@ def handle_message(event):
             event.reply_token,
             TextSendMessage(text='登録したうさよ')
         )
+    # look send messages
     elif log_flag in user_text:
         text = ''
         with db.transaction():

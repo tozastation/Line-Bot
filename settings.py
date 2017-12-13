@@ -1,5 +1,8 @@
 import json
 import requests
+import urllib
+from xml.etree import ElementTree
+import xml.dom.minidom as md
 
 
 class Info(object):
@@ -54,3 +57,19 @@ class Push(object):
         return sentence
 
 
+class Niko(object):
+    def __init__(self):
+        self.url = 'http://www.nicovideo.jp/ranking/fav/hourly/sing?rss=2.0&lang=ja-jp'
+
+    def send_ranking(self):
+        response = urllib.request.urlopen(self.url)
+        root = ElementTree.fromstring(response.read())
+        document = md.parseString(ElementTree.tostring(root, 'utf-8'))
+        links = []
+
+        for a in document.getElementsByTagName('link'):
+            links.append(a.toxml().rstrip('</link>').lstrip('</link>'))
+
+        del links[0]
+        links.insert(0,'この時間のおすすめ動画うさ')
+        return links
