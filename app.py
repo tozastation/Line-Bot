@@ -92,8 +92,10 @@ def handle_message(event):
         )
     elif log_flag in user_text:
         text = []
-        for log in LogInfomation.select().where(UserInfomation.user_id == user_id):
-           text.append(log.log_text)
+        with db.transaction():
+            for log in LogInfomation.select().where(LogInfomation.user_id == user_id):
+                text.append(log.log_text)
+        db.commit()
 
         line_bot_api.reply_message(
             event.reply_token,
