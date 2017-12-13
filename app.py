@@ -9,7 +9,7 @@ from linebot.models import (
     MessageEvent, TextMessage, TextSendMessage,
 )
 from settings import Info, Push
-from model import *
+from model import UserInfomation, LogInfomation, get_user_id, db
 import requests
 import json
 
@@ -66,17 +66,14 @@ def handle_message(event):
     duplication_flag = False
     db.create_tables([UserInfomation], safe=True)
     db.create_tables([LogInfomation], safe=True)
-    try:
-        # Insert User_ID
-        with db.transaction():
-            for user in UserInfomation.select():
-                if user.user_id in event.source.user_id:
-                    duplication_flag = True
-            if duplication_flag is False:
-                UserInfomation.create(user_id=event.source.user_id)
-        db.commit()
-    except Exception as e:
-        print(e)
+    # Insert User_ID
+    with db.transaction():
+        for user in UserInfomation.select():
+            if user.user_id in event.source.user_id:
+                duplication_flag = True
+        if duplication_flag is False:
+            UserInfomation.create(user_id=event.source.user_id)
+    db.commit()
     # reply a message
     payload = {
         "utt": event.message.text,
@@ -99,13 +96,10 @@ def handle_message(event):
     s = requests.session()
     r = s.post(url, data=json.dumps(payload))
     res_json = json.loads(r.text)
-    try:
-        with db.transaction():
-            LogInfomation.create(log_text=event.message.text, log_owner=event.source.user_id, log_status='Receive')
-            LogInfomation.create(log_text=str(res_json['utt']), log_owner='Bot', log_status='Reply')
-        db.commit()
-    except Exception as e:
-        return e
+    with db.transaction():
+        LogInfomation.create(log_text=event.message.text, log_owner=event.source.user_id, log_status='Receive')
+        LogInfomation.create(log_text=str(res_json['utt']), log_owner='Bot', log_status='Reply')
+    db.commit()
     line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(text=str(res_json['utt']))
