@@ -93,7 +93,7 @@ def handle_message(event):
     elif log_flag in user_text:
         text = []
         with db.transaction():
-            for log in LogInfomation.select().where(LogInfomation.user_id == user_id):
+            for log in LogInfomation.select().where(LogInfomation.log_owner == user_id):
                 text.append(log.log_text)
         db.commit()
 
