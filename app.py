@@ -71,7 +71,7 @@ def send_nikoniko_douga():
         for user in UserInfomation.select():
             line_bot_api.push_message(user.user_id,
                                       TextSendMessage(text='この時間の動画うさ。'))
-            for i in range(0,4):
+            for i in range(0,10):
                 try:
                     line_bot_api.push_message(user.user_id,
                                               TextSendMessage(text=titles[i]+'\n'+links[i]))

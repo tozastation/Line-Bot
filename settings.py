@@ -53,7 +53,7 @@ class Push(object):
         line3 = 'temp : ' + str(temp) + '\n'
         line4 = 'weather : ' + str(weather) + '\n'
         line5 = 'description : ' + str(description)+ '\n'
-        line6 = '気をつけて行くうさよ。'
+        line6 = '気をつけて行きやがれうさ。'
         sentence = line1 + line2 + line3 + line4 + line5+ line6
         return sentence
 
