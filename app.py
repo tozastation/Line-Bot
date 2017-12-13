@@ -94,12 +94,12 @@ def handle_message(event):
         text = []
         with db.transaction():
             for log in LogInfomation.select().where(LogInfomation.log_owner == user_id):
-                text.append(log.log_text)
+                text+=(log.log_text+'\n')
         db.commit()
 
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text=text))
+            TextSendMessage(text=text.rstrip('\n')))
     # reply a message
     else:
         payload = {
