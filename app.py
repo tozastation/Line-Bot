@@ -91,7 +91,7 @@ def handle_message(event):
             TextSendMessage(text='登録したうさよ')
         )
     elif log_flag in user_text:
-        text = []
+        text = ''
         with db.transaction():
             for log in LogInfomation.select().where(LogInfomation.log_owner == user_id):
                 text+=(log.log_text+'\n')
