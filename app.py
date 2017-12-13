@@ -49,6 +49,8 @@ def send_nikoniko_news():
     links = niko.send_news_link()
     with db.transaction():
         for user in UserInfomation.select():
+            line_bot_api.push_message(user.user_id,
+                                      TextSendMessage(text='この時間のニュースうさ。'))
             for i in range(0, 5):
                 try:
                     line_bot_api.push_message(user.user_id,
@@ -67,6 +69,8 @@ def send_nikoniko_douga():
     links = niko.send_ranking_link()
     with db.transaction():
         for user in UserInfomation.select():
+            line_bot_api.push_message(user.user_id,
+                                      TextSendMessage(text='この時間の動画うさ。'))
             for i in range(0,4):
                 try:
                     line_bot_api.push_message(user.user_id,

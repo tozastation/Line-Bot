@@ -74,7 +74,6 @@ class Niko(object):
 
 
         del links[0]
-        links.insert(0,'この時間のおすすめ動画うさ')
         return links
 
     def send_ranking_title(self):
@@ -87,7 +86,6 @@ class Niko(object):
             titles.append(a.toxml().rstrip('</title>').lstrip('</title>'))
 
         del titles[0]
-        titles.insert(0, '')
         return titles
 
 
@@ -101,7 +99,6 @@ class Niko(object):
             links.append(a.toxml().rstrip('</link>').lstrip('</link>'))
 
         del links[0]
-        links.insert(0, 'この時間のニュースうさ')
         return links
 
     def send_news_title(self):
@@ -114,5 +111,4 @@ class Niko(object):
             titles.append(a.toxml().rstrip('</title>').lstrip('</title>'))
 
         del titles[0]
-        titles.insert(0, '')
         return titles
