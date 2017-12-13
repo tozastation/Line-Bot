@@ -101,7 +101,7 @@ def handle_message(event):
     reply = str(res_json['utt'])
     with db.transaction():
         LogInfomation.create(log_text=event.message.text, log_owner=event.source.user_id, log_status='Receive')
-        LogInfomation.create(log_text=reply, log_owner='Bot', log_status='Reply')
+        LogInfomation.create(log_text=reply, log_owner='Bot', log_status='Reply', log_time=datetime.datetime.today())
     db.commit()
 
     line_bot_api.reply_message(

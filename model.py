@@ -1,5 +1,5 @@
 from peewee import *
-
+import datetime
 db = PostgresqlDatabase('dfe7lmrbq8vcjl',
                         host='ec2-54-225-113-161.compute-1.amazonaws.com',
                         user='xndkwheicbgvly',
@@ -26,3 +26,4 @@ class LogInfomation(BaseModel):
     log_text = TextField(null=True)
     log_owner = TextField(null=True)
     log_status = TextField(null=True)
+    log_time = DateTimeField(null=True)
