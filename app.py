@@ -62,11 +62,12 @@ def callback():
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    # connect to database
-    # insert user_id
+    # Create Table
     duplication_flag = False
+    db.create_tables([UserInfomation], safe=True)
+    db.create_tables([LogInfomation], safe=True)
     try:
-        db.create_tables([UserInfomation], safe=True)
+        # Insert User_ID
         with db.transaction():
             for user in UserInfomation.select():
                 if user.user_id in event.source.user_id:
@@ -76,7 +77,7 @@ def handle_message(event):
         db.commit()
     except Exception as e:
         print(e)
-    # send a message
+    # reply a message
     payload = {
         "utt": event.message.text,
         "context": "",
@@ -92,12 +93,19 @@ def handle_message(event):
         "place": "北海道",
         "mode": "dialog"
     }
-    endpoint = info.get_endpoint()
-    KEY = info.get_KEY()
+    endpoint = info.get_endpoint() # API EndPoint
+    KEY = info.get_KEY() # API KEY
     url = endpoint+KEY
     s = requests.session()
     r = s.post(url, data=json.dumps(payload))
     res_json = json.loads(r.text)
+    try:
+        with db.transaction():
+            LogInfomation.create(log_text=event.message.text, log_owner=event.source.user_id, log_status='Receive')
+            LogInfomation.create(log_text=str(res_json['utt']), log_owner='Bot', log_status='Reply')
+        db.commit()
+    except Exception as e:
+        return e
     line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(text=str(res_json['utt']))

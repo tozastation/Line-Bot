@@ -45,10 +45,10 @@ class Push(object):
         temp = round(data['main']['temp'] - K, 2)
         weather = data["weather"][0]["main"]
         description = data["weather"][0]["description"]
-        line1 = "おはよううさ。今日の天気うさ。\n"
-        line2 = 'City :' + str(city) + '\n'
-        line3 = 'temp :' + str(temp) + '\n'
-        line4 = 'weather :' + str(weather) + '\n'
+        line1 = "おはよううさ〜。今日の天気うさ。\n"
+        line2 = 'City : ' + str(city) + '\n'
+        line3 = 'temp : ' + str(temp) + '\n'
+        line4 = 'weather : ' + str(weather) + '\n'
         line5 = 'description : ' + str(description)
         sentence = line1 + line2 + line3 + line4 + line5
         return sentence
