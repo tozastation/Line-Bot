@@ -4,6 +4,7 @@ import information
 import nikonikodouga
 import model
 import bus_information
+import pycurl
 from flask import Flask, request, abort, jsonify
 from linebot import (
     LineBotApi, WebhookHandler
@@ -176,9 +177,9 @@ def handle_message(event):
             event.reply_token,
             TextSendMessage(text=text.rstrip('\n')))
     elif bus_flag in user_text:
-        response = requests.post(
-            'https://damp-shelf-47440.herokuapp.com/bus')
-        print(response.json())
+        curl = pycurl.Curl()
+        curl.setopt(pycurl.URL, 'https://damp-shelf-47440.herokuapp.com/bus')
+        curl.perform()
     # reply a message
     # Docomo APIへ送信
     else:
