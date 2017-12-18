@@ -187,9 +187,8 @@ def handle_message(event):
             "place": "北海道",
             "mode": "dialog"
         }
-        info = information.Info()
         endpoint = info.get_endpoint() # API EndPoint
-        KEY = info.get_KEY() # API KEY
+        KEY = info.get_key() # API KEY
         url = endpoint + KEY
         s = requests.session()
         r = s.post(url, data=json.dumps(payload))
