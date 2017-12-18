@@ -1,10 +1,7 @@
 import json
-import requests
-import information
-import nikonikodouga
-import model
-import bus_information
+import datetime
 import pycurl
+import requests
 from flask import Flask, request, abort, g
 from linebot import (
     LineBotApi, WebhookHandler
@@ -16,6 +13,10 @@ from linebot.models import (
     MessageEvent, TextMessage, TextSendMessage,
 )
 
+import bus_information
+import information
+import model
+import nikonikodouga
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
@@ -201,11 +202,11 @@ def handle_message(event):
             model.LogInfomation.create(log_text=user_text,
                                        log_owner=user_id,
                                        log_status='Receive',
-                                       log_time=model.datetime.datetime.today())
+                                       log_time=datetime.datetime.today())
             model.LogInfomation.create(log_text=reply,
                                        log_owner='Bot',
                                        log_status='Reply',
-                                       log_time=model.datetime.datetime.today())
+                                       log_time=datetime.datetime.today())
         model.db.commit()
 
         line_bot_api.reply_message(
