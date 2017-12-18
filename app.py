@@ -5,7 +5,7 @@ import nikonikodouga
 import model
 import bus_information
 import pycurl
-from flask import Flask, request, abort, jsonify
+from flask import Flask, request, abort, g
 from linebot import (
     LineBotApi, WebhookHandler
 )
@@ -19,9 +19,9 @@ from linebot.models import (
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
-info = information.Info()
-YOUR_CHANNEL_ACCESS_TOKEN = info.get_ycat()
-YOUR_CHANNEL_SECRET = info.get_ycs()
+g.info = information.Info()
+YOUR_CHANNEL_ACCESS_TOKEN = g.info.get_ycat()
+YOUR_CHANNEL_SECRET = g.info.get_ycs()
 line_bot_api = LineBotApi(YOUR_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(YOUR_CHANNEL_SECRET)
 
@@ -187,8 +187,8 @@ def handle_message(event):
             "place": "北海道",
             "mode": "dialog"
         }
-        endpoint = info.get_endpoint() # API EndPoint
-        KEY = info.get_KEY() # API KEY
+        endpoint = g.info.get_endpoint() # API EndPoint
+        KEY = g.info.get_KEY() # API KEY
         url = endpoint + KEY
         s = requests.session()
         r = s.post(url, data=json.dumps(payload))
