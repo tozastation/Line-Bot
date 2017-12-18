@@ -1,0 +1,7 @@
+YOUR_CHANNEL_ACCESS_TOKEN = 'Hy+09fOE1LxaNilXwg/86HTXZx4Ua28T6vLu4RwSl4ToKNogTFCMYJLBYbtHGNuUbAL4tYp89SIiBp2l255nrW0FA49ryg7TbiPFIqXq+XEI/nJBS4PFVwHi9IShgtzeXrcIlz1JeCVDCZKqkVIC0AdB04t89/1O/w1cDnyilFU='
+YOUR_CHANNEL_SECRET = '4ea4eac1ae4f9f25b2082dc1d37ac972'
+KEY = '2f42326a4d52784249447133356f656338317a3373464a4c4d6c73506a462f72574331687568694a637641'
+endpoint = 'https://api.apigw.smt.docomo.ne.jp/dialogue/v1/dialogue?APIKEY='
+API_KEY = "b658161bac2942afc45703a43ff1b362"
+api = "http://api.openweathermap.org/data/2.5/weather?q={city}&APPID={key}"
+

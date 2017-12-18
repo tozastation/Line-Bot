@@ -1,4 +1,10 @@
-from flask import Flask, request, abort
+import json
+import requests
+import information
+import nikonikodouga
+import model
+import bus_information
+from flask import Flask, request, abort, jsonify
 from linebot import (
     LineBotApi, WebhookHandler
 )
@@ -8,47 +14,70 @@ from linebot.exceptions import (
 from linebot.models import (
     MessageEvent, TextMessage, TextSendMessage,
 )
-from settings import Info, Push, Niko
-from model import *
-import requests
-import json
 
 
 app = Flask(__name__)
-info = Info()
-YOUR_CHANNEL_ACCESS_TOKEN = info.get_YCAT()
-YOUR_CHANNEL_SECRET = info.get_YCS()
+app.config['JSON_AS_ASCII'] = False
+info = information.Info()
+YOUR_CHANNEL_ACCESS_TOKEN = info.get_ycat()
+YOUR_CHANNEL_SECRET = info.get_ycs()
 line_bot_api = LineBotApi(YOUR_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(YOUR_CHANNEL_SECRET)
 
-
+# index
 @app.route('/')
 def hello_world():
     return 'Hello World!'
 
+# send a bus data
+@app.route('/bus')
+def send_bus():
+    bus = bus_information.BusInfo()
+    datas = bus.send_info()
+    with model.db.transaction():
+        for user in model.UserInfomation.select():
+            if user.user_name == 'りょう':
+                for data in datas:
+                    late = data[0]
+                    type = data[1]
+                    end = data[2]
+                    time = data[3]
+                    if not(late in '無し'):
+                        line1 = '予定 : '+late+'\n'
+                        line2 = '系統 : '+type
+                        line3 = '終点 : '+end+'\n'
+                        line4 = '時刻 : '+time+'\n'
+                        sentence = line3 + line4 + line1 + line2
+                        try:
+                            line_bot_api.push_message(user.user_id,
+                                                      TextSendMessage(text=sentence))
+                        except LineBotApiError as e:
+                            print(e)
+    model.db.commit()
+    return 'OK\n'
+
 
 @app.route('/send')
 def send_morning():
-    push_man = Push()
-    sentence = push_man.morning_information()
-    with db.transaction():
-        for user in get_user_id.select():
+    sentence = g.info.morning_information()
+    with model.db.transaction():
+        for user in model.get_user_id.select():
             try:
                 line_bot_api.push_message(user.user_id,
                                           TextSendMessage(text=sentence))
             except LineBotApiError as e:
                     print(e)
-    db.commit()
+    model.db.commit()
     return 'Complete to Send\n'
 
 
 @app.route('/nikoniko/news')
 def send_nikoniko_news():
-    niko = Niko()
-    titles = niko.send_news_title()
-    links = niko.send_news_link()
-    with db.transaction():
-        for user in UserInfomation.select():
+    niko = nikonikodouga.Niko()
+    titles = niko.send_niko_list('title')
+    links = niko.send_niko_list('link')
+    with model.db.transaction():
+        for user in model.UserInfomation.select():
             line_bot_api.push_message(user.user_id,
                                       TextSendMessage(text='この時間のニュースうさ。'))
             for i in range(0, 5):
@@ -57,18 +86,18 @@ def send_nikoniko_news():
                                               TextSendMessage(text=titles[i] + '\n' + links[i]))
                 except LineBotApiError as e:
                     print(e)
-    db.commit()
+    model.db.commit()
     return 'Complete to Send\n'
 
 
 # send a today's ranking
 @app.route('/nikoniko/douga')
 def send_nikoniko_douga():
-    niko = Niko()
-    titles = niko.send_ranking_title()
-    links = niko.send_ranking_link()
-    with db.transaction():
-        for user in UserInfomation.select():
+    niko = nikonikodouga.Niko()
+    titles = niko.send_send_list('title')
+    links = niko.send_ranking_link('link')
+    with model.db.transaction():
+        for user in model.UserInfomation.select():
             line_bot_api.push_message(user.user_id,
                                       TextSendMessage(text='この時間の動画うさ。'))
             for i in range(0,10):
@@ -77,7 +106,7 @@ def send_nikoniko_douga():
                                               TextSendMessage(text=titles[i]+'\n'+links[i]))
                 except LineBotApiError as e:
                     print(e)
-    db.commit()
+    model.db.commit()
     return 'Complete to Send\n'
 
 
@@ -103,29 +132,30 @@ def callback():
 def handle_message(event):
     # Create Table
     duplication_flag = False
-    user_name_flag = '@'
+    user_name_flag = '@name:'
     log_flag = 'ls'
-    db.create_tables([UserInfomation], safe=True)
-    db.create_tables([LogInfomation], safe=True)
+    bus_flag = '@bus'
+    model.db.create_tables([model.UserInfomation], safe=True)
+    model.db.create_tables([model.LogInfomation], safe=True)
     user_id = event.source.user_id
     user_text = event.message.text
     # Insert User_ID
-    with db.transaction():
-        for user in UserInfomation.select():
+    with model.db.transaction():
+        for user in model.UserInfomation.select():
             if user.user_id in user_id:
                 duplication_flag = True
 
         if duplication_flag is False:
-            UserInfomation.create(user_id=user_id)
+            model.UserInfomation.create(user_id=user_id)
 
-    db.commit()
+    model.db.commit()
     # add user_name
     if user_name_flag in user_text:
-        with db.transaction():
+        with model.db.transaction():
             user_name = user_text.replace(user_name_flag, '')
-            query = UserInfomation.update(user_name=user_name).where(UserInfomation.user_id == user_id)
+            query = model.UserInfomation.update(user_name=user_name).where(model.UserInfomation.user_id == user_id)
             query.execute()
-        db.commit()
+        model.db.commit()
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text='登録したうさよ')
@@ -133,17 +163,22 @@ def handle_message(event):
     # look send messages
     elif log_flag in user_text:
         text = ''
-        with db.transaction():
+        with model.db.transaction():
             count = 0
-            for log in LogInfomation.select().where(LogInfomation.log_owner == user_id):
-                count+=1
-                text+=(str(count)+':'+log.log_text+str(log.log_time)+'\n')
-        db.commit()
+            for log in model.LogInfomation.select().where(model.LogInfomation.log_owner == user_id):
+                count += 1
+                text += (str(count)+':'+log.log_text+str(log.log_time)+'\n')
+        model.db.commit()
 
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=text.rstrip('\n')))
+    elif bus_flag in user_text:
+        response = requests.get(
+            'http://127.0.0.1:5000/bus')
+        print(response.json())
     # reply a message
+    # Docomo APIへ送信
     else:
         payload = {
             "utt": user_text,
@@ -162,23 +197,23 @@ def handle_message(event):
         }
         endpoint = info.get_endpoint() # API EndPoint
         KEY = info.get_KEY() # API KEY
-        url = endpoint+KEY
+        url = endpoint + KEY
         s = requests.session()
         r = s.post(url, data=json.dumps(payload))
         res_json = json.loads(r.text)
-        user = UserInfomation.get(UserInfomation.user_id == user_id)
+        user = model.UserInfomation.get(model.UserInfomation.user_id == user_id)
         dear = 'なんだうさ。'+user.user_name+'さん。\n'
         reply = dear+str(res_json['utt'])
-        with db.transaction():
-            LogInfomation.create(log_text=user_text,
-                                 log_owner=user_id,
-                                 log_status='Receive',
-                                 log_time = datetime.datetime.today())
-            LogInfomation.create(log_text=reply,
-                                 log_owner='Bot',
-                                 log_status='Reply',
-                                 log_time=datetime.datetime.today())
-        db.commit()
+        with model.db.transaction():
+            model.LogInfomation.create(log_text=user_text,
+                                       log_owner=user_id,
+                                       log_status='Receive',
+                                       log_time=model.datetime.datetime.today())
+            model.LogInfomation.create(log_text=reply,
+                                       log_owner='Bot',
+                                       log_status='Reply',
+                                       log_time=model.datetime.datetime.today())
+        model.db.commit()
 
         line_bot_api.reply_message(
             event.reply_token,
