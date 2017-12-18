@@ -24,10 +24,12 @@ YOUR_CHANNEL_SECRET = info.get_ycs()
 line_bot_api = LineBotApi(YOUR_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(YOUR_CHANNEL_SECRET)
 
+
 # index
 @app.route('/')
 def hello_world():
     return 'Hello World!'
+
 
 # send a bus data
 @app.route('/bus')
@@ -175,7 +177,7 @@ def handle_message(event):
             TextSendMessage(text=text.rstrip('\n')))
     elif bus_flag in user_text:
         response = requests.get(
-            'http://127.0.0.1:5000/bus')
+            'https://damp-shelf-47440.herokuapp.com/bus')
         print(response.json())
     # reply a message
     # Docomo APIへ送信
