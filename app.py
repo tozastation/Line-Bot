@@ -176,7 +176,7 @@ def handle_message(event):
             event.reply_token,
             TextSendMessage(text=text.rstrip('\n')))
     elif bus_flag in user_text:
-        response = requests.get(
+        response = requests.post(
             'https://damp-shelf-47440.herokuapp.com/bus')
         print(response.json())
     # reply a message
