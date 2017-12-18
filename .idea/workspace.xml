@@ -1,26 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="fd2b6028-537b-4d85-922b-3155912e942c" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/mymodule/timer.py" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/app.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/model.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/settings.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/test/Procfile" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/test/requirements.txt" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/test/runtime.txt" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/test/setup.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/test/test.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/test/test_mymodule/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/test/test_mymodule/information.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/test/test_mymodule/model.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/test/test_mymodule/nikonikodouga.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/test/test_mymodule/settings.py" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/heroku_test.iml" afterPath="$PROJECT_DIR$/.idea/heroku_test.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test.py" afterPath="$PROJECT_DIR$/test.py" />
-    </list>
+    <list default="true" id="fd2b6028-537b-4d85-922b-3155912e942c" name="Default" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
