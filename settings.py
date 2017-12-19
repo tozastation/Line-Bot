@@ -5,3 +5,4 @@ endpoint = 'https://api.apigw.smt.docomo.ne.jp/dialogue/v1/dialogue?APIKEY='
 API_KEY = "b658161bac2942afc45703a43ff1b362"
 api = "http://api.openweathermap.org/data/2.5/weather?q={city}&APPID={key}"
 
+

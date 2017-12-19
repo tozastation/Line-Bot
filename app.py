@@ -147,6 +147,10 @@ def handle_message(event):
     get_command_flag = '@help'
     # Receive Command @help
     get_weather_flag = '@weather'
+    # Receive Command @course
+    get_course_flag = '@course'
+    # Receive Command @course
+    get_no_class_flag = '@noclass'
 
     # Create Database Tables
     model.db.create_tables([model.UserInfomation], safe=True)
@@ -178,23 +182,47 @@ def handle_message(event):
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text='登録したうさ。'))
-    # activate curl command
+    elif get_course_flag in user_text:
+
+        with model.db.transaction():
+            user_course = user_text.replace(get_course_flag, '')
+            query = model.UserInfomation.update(user_course=user_course).where(model.UserInfomation.user_id == user_id)
+            query.execute()
+        model.db.commit()
+    elif get_no_class_flag in user_text:
+        with model.db.transaction():
+            for user in model.UserInfomation.select():
+                for no_class in model.NoClass.select().where(model.NoClass.class_target in user.user_course):
+                    line_one = no_class.status
+                    line_two = '曜日' + no_class.class_date + '(' + no_class.class_day + ')' + no_class.class_time
+                    line_three = '授業名' + no_class.class_name
+                    line_four = '担当教員' + no_class.class_teacher
+                    line_five = '該当コース' + no_class.class_target
+                    text = line_one + '\n' + line_two + '\n' + line_three + '\n' + line_four + '\n' + line_five
+                    line_bot_api.push_message(user.user_id,
+                                              TextSendMessage(text=text))
+    # @bus
     elif bus_flag in user_text:
         r = requests.get('https://damp-shelf-47440.herokuapp.com/bus')
         r.json()
+    # @help
     elif get_command_flag in user_text:
-        func_one = '@name : ユーザー名の追加\n'
-        func_two = '@bus : バス接近情報の取得'
-        #func_one = '@name : ユーザー名の追加\n'
-        #func_one = '@name : ユーザー名の追加\n'
-        text = func_one + func_two
+        func_name = '@name : ユーザー名の追加(ex.@nameRabbit)\n'
+        func_course = '@course : コースの登録(ex.@name2-ABCD)\n'
+        func_bus = '@bus : バス接近情報の取得\n'
+        func_no_class = '@class : 休講情報の取得\n'
+        func_weather = '@weather : 天気の取得'
+        text = func_name + func_course + func_no_class + func_bus + func_weather
+
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=text))
+    # @weather
     elif get_weather_flag in user_text:
         r = requests.get('https://damp-shelf-47440.herokuapp.com/weather')
         r.json()
     else:
+        # Send json to Docomo API
         payload = {
             "utt": user_text,
             "context": "",
@@ -210,8 +238,11 @@ def handle_message(event):
             "place": "北海道",
             "mode": "dialog"
         }
-        endpoint = info.get_endpoint() # API EndPoint
-        KEY = info.get_key() # API KEY
+
+        # API EndPoint
+        endpoint = info.get_endpoint()
+        # API KEY
+        KEY = info.get_key()
         url = endpoint + KEY
         s = requests.session()
         r = s.post(url, data=json.dumps(payload))
