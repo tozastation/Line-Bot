@@ -3,7 +3,7 @@
 import re
 import json
 line_list = []
-with open('NoClass.txt', 'r') as f:
+with open('Database/NoClass.txt', 'r') as f:
     for line in f:
         line = line.replace('\n', '')
         lines = line.split(' ')
@@ -44,7 +44,7 @@ for line in line_list:
     }
     text_list.append(text_json)
 
-with open('NoClass.json', 'w') as f:
+with open('Database/NoClass.json', 'w') as f:
     json.dump(text_list, f, ensure_ascii=False)
 
 for text in text_list:

@@ -156,6 +156,8 @@ def handle_message(event):
     user_id = event.source.user_id
     # 送信元テキスト取得
     user_text = event.message.text
+    # テーブルから同一ユーザ取得
+    this_user = model.UserInfomation.get(model.UserInfomation.user_id == user_id)
 
     # ユーザID取得
     with model.db.transaction():
@@ -193,22 +195,22 @@ def handle_message(event):
     elif get_no_class_flag in user_text:
 
         with model.db.transaction():
-            for user in model.UserInfomation.select():
+            if not (this_user.user_course is None):
                 for no_class in model.NoClass.select():
-                    if not(user.user_course is None):
-                        if user.user_course in no_class.class_target:
-                            line_one = no_class.status
-                            line_two = '曜日 : ' + no_class.class_date + '(' + no_class.class_day + ')' + no_class.class_time
-                            line_three = '授業名 : ' + no_class.class_name
-                            line_four = '担当教員 : ' + no_class.class_teacher
-                            line_five = '該当コース : ' + no_class.class_target
-                            text = line_one + '\n' + line_two + '\n' + line_three + '\n' + line_four + '\n' + line_five
-                            line_bot_api.push_message(user.user_id,
-                                                      TextSendMessage(text=text))
-                    else:
-                        text = '登録してないうさ。'
-                        line_bot_api.push_message(user.user_id,
+                    if this_user.user_course in no_class.class_target
+                        line_one = no_class.status
+                        line_two = '曜日 : ' + no_class.class_date + '(' + no_class.class_day + ')' + no_class.class_time
+                        line_three = '授業名 : ' + no_class.class_name
+                        line_four = '担当教員 : ' + no_class.class_teacher
+                        line_five = '該当コース : ' + no_class.class_target
+                        text = line_one + '\n' + line_two + '\n' + line_three + '\n' + line_four + '\n' + line_five
+                        line_bot_api.push_message(this_user.user_id,
                                                   TextSendMessage(text=text))
+            else:
+                text = '登録してないうさ。'
+                line_bot_api.push_message(this_user.user_id,
+                                              TextSendMessage(text=text))
+        model.db.commit()
 
     # @bus
     elif bus_flag in user_text:
@@ -253,15 +255,14 @@ def handle_message(event):
         # API EndPoint
         endpoint = info.get_endpoint()
         # API KEY
-        KEY = info.get_key()
-        url = endpoint + KEY
+        key = info.get_key()
+        url = endpoint + key
         s = requests.session()
         r = s.post(url, data=json.dumps(payload))
         res_json = json.loads(r.text)
 
-        user = model.UserInfomation.get(model.UserInfomation.user_id == user_id)
         dear = ''
-        if not(user.user_name is None):
+        if not(this_user.user_name is None):
             dear = 'なんだうさ。'+user.user_name+'さん。\n'
         text = dear + str(res_json['utt'])
 
