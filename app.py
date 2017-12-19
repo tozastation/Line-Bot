@@ -197,7 +197,7 @@ def handle_message(event):
         with model.db.transaction():
             if not (this_user.user_course is None):
                 for no_class in model.NoClass.select():
-                    if this_user.user_course in no_class.class_target
+                    if this_user.user_course in no_class.class_target:
                         line_one = no_class.status
                         line_two = '曜日 : ' + no_class.class_date + '(' + no_class.class_day + ')' + no_class.class_time
                         line_three = '授業名 : ' + no_class.class_name
