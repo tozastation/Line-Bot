@@ -175,7 +175,6 @@ def handle_message(event):
 
         with model.db.transaction():
             user_name = user_text.replace(user_name_flag, '')
-            user_name = user_name.replace(' ', '')
             query = model.UserInfomation.update(user_name=user_name).where(model.UserInfomation.user_id == user_id)
             query.execute()
         model.db.commit()
@@ -194,7 +193,7 @@ def handle_message(event):
         with model.db.transaction():
             for user in model.UserInfomation.select():
                 for no_class in model.NoClass.select():
-                    if str(model.NoClass.class_target) in str(user.user_course):
+                    if model.NoClass.class_target in user.user_course:
                         line_one = no_class.status
                         line_two = '曜日' + no_class.class_date + '(' + no_class.class_day + ')' + no_class.class_time
                         line_three = '授業名' + no_class.class_name
