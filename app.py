@@ -192,15 +192,16 @@ def handle_message(event):
     elif get_no_class_flag in user_text:
         with model.db.transaction():
             for user in model.UserInfomation.select():
-                for no_class in model.NoClass.select().where(model.NoClass.class_target in user.user_course):
-                    line_one = no_class.status
-                    line_two = '曜日' + no_class.class_date + '(' + no_class.class_day + ')' + no_class.class_time
-                    line_three = '授業名' + no_class.class_name
-                    line_four = '担当教員' + no_class.class_teacher
-                    line_five = '該当コース' + no_class.class_target
-                    text = line_one + '\n' + line_two + '\n' + line_three + '\n' + line_four + '\n' + line_five
-                    line_bot_api.push_message(user.user_id,
-                                              TextSendMessage(text=text))
+                for no_class in model.NoClass.select():
+                    if model.NoClass.class_target in user.user_course:
+                        line_one = no_class.status
+                        line_two = '曜日' + no_class.class_date + '(' + no_class.class_day + ')' + no_class.class_time
+                        line_three = '授業名' + no_class.class_name
+                        line_four = '担当教員' + no_class.class_teacher
+                        line_five = '該当コース' + no_class.class_target
+                        text = line_one + '\n' + line_two + '\n' + line_three + '\n' + line_four + '\n' + line_five
+                        line_bot_api.push_message(user.user_id,
+                                                  TextSendMessage(text=text))
     # @bus
     elif bus_flag in user_text:
         r = requests.get('https://damp-shelf-47440.herokuapp.com/bus')
