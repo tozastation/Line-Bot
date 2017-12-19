@@ -136,7 +136,7 @@ def callback():
 def handle_message(event):
     # Create Table
     duplication_flag = False
-    user_name_flag = '@name:'
+    # user_name_flag = '@name:'
     bus_flag = '@bus'
     model.db.create_tables([model.UserInfomation], safe=True)
     model.db.create_tables([model.LogInfomation], safe=True)
@@ -153,20 +153,20 @@ def handle_message(event):
 
     model.db.commit()
     # add user_name
-    if user_name_flag in user_text:
-
-        with model.db.transaction():
-            user_name = user_text.replace(user_name_flag, '')
-            query = model.UserInfomation.update(user_name=user_name).where(model.UserInfomation.user_id == user_id)
-            query.execute()
-        model.db.commit()
-
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text='登録したうさよ')
-        )
-    # activate curl command
-    elif bus_flag in user_text:
+    # if user_name_flag in user_text:
+    #
+    #     with model.db.transaction():
+    #         user_name = user_text.replace(user_name_flag, '')
+    #         query = model.UserInfomation.update(user_name=user_name).where(model.UserInfomation.user_id == user_id)
+    #         query.execute()
+    #     model.db.commit()
+    #
+    #     line_bot_api.reply_message(
+    #         event.reply_token,
+    #         TextSendMessage(text='登録したうさよ')
+    #     )
+    # # activate curl command
+    if bus_flag in user_text:
         curl = pycurl.Curl()
         curl.setopt(pycurl.URL, 'https://damp-shelf-47440.herokuapp.com/bus')
         curl.perform()
@@ -194,9 +194,9 @@ def handle_message(event):
         s = requests.session()
         r = s.post(url, data=json.dumps(payload))
         res_json = json.loads(r.text)
-        user = model.UserInfomation.get(model.UserInfomation.user_id == user_id)
-        dear = 'なんだうさ。'+user.user_name+'さん。\n'
-        reply = dear+str(res_json['utt'])
+        # user = model.UserInfomation.get(model.UserInfomation.user_id == user_id)
+        # dear = 'なんだうさ。'+user.user_name+'さん。\n'
+        reply = str(res_json['utt'])
 
         with model.db.transaction():
             model.LogInfomation.create(log_text=user_text,
