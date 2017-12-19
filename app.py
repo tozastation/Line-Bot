@@ -26,7 +26,7 @@ line_bot_api = LineBotApi(YOUR_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(YOUR_CHANNEL_SECRET)
 
 
-# send a bus data
+# バス接近情報
 @app.route('/bus')
 def send_bus():
     bus = bus_information.BusInfo()
@@ -51,11 +51,10 @@ def send_bus():
                     except LineBotApiError as e:
                         print(e)
     model.db.commit()
-
     return 'OK\n'
 
 
-# send a weather data
+# 天気予報
 @app.route('/weather')
 def send_morning():
     text = info.morning_information()
@@ -68,10 +67,10 @@ def send_morning():
             except LineBotApiError as e:
                     print(e)
     model.db.commit()
-
     return 'Complete to Send\n'
 
 
+# ニコニコ動画「ニュース」
 @app.route('/nikoniko/news')
 def send_nikoniko_news():
     niko = nikonikodouga.Niko()
@@ -89,11 +88,10 @@ def send_nikoniko_news():
                 except LineBotApiError as e:
                     print(e)
     model.db.commit()
-
     return 'Complete to Send\n'
 
 
-# send a today's ranking
+# ニコニコ動画「ランキング」
 @app.route('/nikoniko/ranking')
 def send_nikoniko_douga():
     niko = nikonikodouga.Niko()
@@ -111,7 +109,6 @@ def send_nikoniko_douga():
                 except LineBotApiError as e:
                     print(e)
     model.db.commit()
-
     return 'Complete to Send\n'
 
 
@@ -139,28 +136,28 @@ def handle_message(event):
     # Check Duplication
     duplication_flag = False
 
-    # Receive Command @name
+    # コマンド @name
     user_name_flag = '@name'
-    # Receive Command @bus
+    # コマンド @bus
     bus_flag = '@bus'
-    # Receive Command @help
+    # コマンド @help
     get_command_flag = '@help'
-    # Receive Command @help
+    # コマンド @help
     get_weather_flag = '@weather'
-    # Receive Command @course
+    # コマンド @course
     get_course_flag = '@course'
-    # Receive Command @course
+    # コマンド @course
     get_no_class_flag = '@noclass'
 
-    # Create Database Tables
+    # テーブル作成
     model.db.create_tables([model.UserInfomation], safe=True)
     model.db.create_tables([model.LogInfomation], safe=True)
-    # get a user_id
+    # 送信元ユーザID取得
     user_id = event.source.user_id
-    # get a user message
+    # 送信元テキスト取得
     user_text = event.message.text
 
-    # Insert User_ID
+    # ユーザID取得
     with model.db.transaction():
         for user in model.UserInfomation.select():
             if user.user_id in user_id:
@@ -170,7 +167,7 @@ def handle_message(event):
             model.UserInfomation.create(user_id=user_id)
 
     model.db.commit()
-    # add user_name
+    # ユーザ名登録
     if user_name_flag in user_text:
 
         with model.db.transaction():
@@ -182,6 +179,8 @@ def handle_message(event):
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text='登録したうさ。'))
+
+    # コース登録
     elif get_course_flag in user_text:
 
         with model.db.transaction():
@@ -189,41 +188,47 @@ def handle_message(event):
             query = model.UserInfomation.update(user_course=user_course).where(model.UserInfomation.user_id == user_id)
             query.execute()
         model.db.commit()
+
+    # 休講情報Push
     elif get_no_class_flag in user_text:
+
         with model.db.transaction():
             for user in model.UserInfomation.select():
                 for no_class in model.NoClass.select():
-                    if no_class.class_target in user.user_course:
+                    if (no_class.class_target in user.user_course) and not(user.user_course is None):
                         line_one = no_class.status
-                        line_two = '曜日' + no_class.class_date + '(' + no_class.class_day + ')' + no_class.class_time
-                        line_three = '授業名' + no_class.class_name
-                        line_four = '担当教員' + no_class.class_teacher
-                        line_five = '該当コース' + no_class.class_target
+                        line_two = '曜日 : ' + no_class.class_date + '(' + no_class.class_day + ')' + no_class.class_time
+                        line_three = '授業名 : ' + no_class.class_name
+                        line_four = '担当教員 : ' + no_class.class_teacher
+                        line_five = '該当コース : ' + no_class.class_target
                         text = line_one + '\n' + line_two + '\n' + line_three + '\n' + line_four + '\n' + line_five
                         line_bot_api.push_message(user.user_id,
+
                                                   TextSendMessage(text=text))
     # @bus
     elif bus_flag in user_text:
         r = requests.get('https://damp-shelf-47440.herokuapp.com/bus')
         r.json()
+
     # @help
     elif get_command_flag in user_text:
-        func_name = '@name : ユーザー名の追加(ex.@nameRabbit)\n'
-        func_course = '@course : コースの登録(ex.@name2-ABCD)\n'
+        func_name = '@name : ユーザー名の追加\n(ex.@nameRabbit)\n'
+        func_course = '@course : コースの登録\n(ex.@name2-ABCD)\n'
         func_bus = '@bus : バス接近情報の取得\n'
-        func_no_class = '@class : 休講情報の取得\n'
+        func_no_class = '@noclass : 休講情報の取得\n'
         func_weather = '@weather : 天気の取得'
         text = func_name + func_course + func_no_class + func_bus + func_weather
 
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=text))
+
     # @weather
     elif get_weather_flag in user_text:
         r = requests.get('https://damp-shelf-47440.herokuapp.com/weather')
         r.json()
     else:
-        # Send json to Docomo API
+        # ドコモAPI
         payload = {
             "utt": user_text,
             "context": "",
@@ -248,6 +253,7 @@ def handle_message(event):
         s = requests.session()
         r = s.post(url, data=json.dumps(payload))
         res_json = json.loads(r.text)
+
         user = model.UserInfomation.get(model.UserInfomation.user_id == user_id)
         dear = ''
         if not(user.user_name is None):
