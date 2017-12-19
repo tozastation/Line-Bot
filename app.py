@@ -175,6 +175,7 @@ def handle_message(event):
 
         with model.db.transaction():
             user_name = user_text.replace(user_name_flag, '')
+            user_name = user_name.replace(' ', '')
             query = model.UserInfomation.update(user_name=user_name).where(model.UserInfomation.user_id == user_id)
             query.execute()
         model.db.commit()
