@@ -18,5 +18,6 @@ peewee==2.10.2
 psycopg2==2.7.3.2
 pycurl==7.43.0.1
 requests==2.18.4
+selenium==3.8.0
 urllib3==1.22
 Werkzeug==0.13
