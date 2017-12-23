@@ -1,1 +1,0 @@
-PGPASSWORD=9ae7ca11594e986db1415eb470e4af59af9271f348ef573dd975e09d8d28398b psql dfe7lmrbq8vcjl -h ec2-54-225-113-161.compute-1.amazonaws.com -p 5432 -U xndkwheicbgvly
