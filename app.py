@@ -21,8 +21,8 @@ app.config['JSON_AS_ASCII'] = False
 info = Info()
 YOUR_CHANNEL_ACCESS_TOKEN = info.get_ycat()
 YOUR_CHANNEL_SECRET = info.get_ycs()
-line_bot_api = LineBotApi(YOUR_CHANNEL_ACCESS_TOKEN)
-handler = WebhookHandler(YOUR_CHANNEL_SECRET)
+line_bot_api = LineBotApi(info.get_ycat())
+handler = WebhookHandler(info.get_ycs())
 
 
 # バス接近情報

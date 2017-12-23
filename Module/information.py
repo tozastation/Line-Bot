@@ -7,12 +7,12 @@ import requests
 
 class Info(object):
     def __init__(self):
-        self.__YOUR_CHANNEL_ACCESS_TOKEN = os.environ['YOUR_CHANNEL_ACCESS_TOKEN']
-        self.__YOUR_CHANNEL_SECRET = os.environ['YOUR_CHANNEL_SECRET']
-        self.__DOCOMO_API_KEY = os.environ['DOCOMO_API_KEY']
-        self.__DOCOMO_ENDPOINT = os.environ['DOCOMO_ENDPOINT']
-        self.__WEATHER_API_KEY = os.environ['WEATHER_API_KEY']
-        self.__WEATHER_API = os.environ['WEATHER_API']
+        self.__YOUR_CHANNEL_ACCESS_TOKEN = os.environ["YOUR_CHANNEL_ACCESS_TOKEN"]
+        self.__YOUR_CHANNEL_SECRET = os.environ["YOUR_CHANNEL_SECRET"]
+        self.__DOCOMO_API_KEY = os.environ["DOCOMO_API_KEY"]
+        self.__DOCOMO_ENDPOINT = "https://api.apigw.smt.docomo.ne.jp/dialogue/v1/dialogue?APIKEY="
+        self.__WEATHER_API_KEY = os.environ["WEATHER_API_KEY"]
+        self.__WEATHER_API = "http://api.openweathermap.org/data/2.5/weather?q={city}&APPID={key}"
 
     def get_ycat(self):
         return self.__YOUR_CHANNEL_ACCESS_TOKEN
@@ -20,21 +20,21 @@ class Info(object):
     def get_ycs(self):
         return self.__YOUR_CHANNEL_SECRET
 
-    def get_key(self):
+    def get_docomo_api_key(self):
         return self.__DOCOMO_API_KEY
 
-    def get_endpoint(self):
+    def get_docomo_endpoint(self):
         return self.__DOCOMO_ENDPOINT
 
-    def get_api_key(self):
+    def get_weather_api_key(self):
         return self.__WEATHER_API_KEY
 
-    def get_api(self):
+    def get_weather_api(self):
         return self.__WEATHER_API
 
     def morning_information(self):
-        api = self.get_api()
-        api_key = self.get_api_key()
+        api = self.get_weather_api()
+        api_key = self.get_weather_api_key()
         city_name = 'Hakodate'
         url = api.format(city=city_name, key=api_key)
         response = requests.get(url)
