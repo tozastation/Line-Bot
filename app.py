@@ -253,9 +253,9 @@ def handle_message(event):
         }
 
         # API EndPoint
-        endpoint = info.get_endpoint()
+        endpoint = info.get_docomo_endpoint()
         # API KEY
-        key = info.get_key()
+        key = info.get_docomo_api_key()
         url = endpoint + key
         s = requests.session()
         r = s.post(url, data=json.dumps(payload))
