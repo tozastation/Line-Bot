@@ -2,7 +2,7 @@
 # coding:utf-8
 import unittest
 
-from Main.Module import bus_information
+from Module import bus_information
 
 
 class BusInfo(unittest.TestCase):

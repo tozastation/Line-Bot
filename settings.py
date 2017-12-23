@@ -4,5 +4,6 @@ KEY = '2f42326a4d52784249447133356f656338317a3373464a4c4d6c73506a462f72574331687
 endpoint = 'https://api.apigw.smt.docomo.ne.jp/dialogue/v1/dialogue?APIKEY='
 API_KEY = "b658161bac2942afc45703a43ff1b362"
 api = "http://api.openweathermap.org/data/2.5/weather?q={city}&APPID={key}"
+TIME_ZONE = 'Asia/Tokyo'
 
 

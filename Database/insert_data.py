@@ -2,7 +2,7 @@
 # coding:utf-8
 import json
 
-from Main.Module import model
+from Module import model
 
 with model.db.transaction():
     with open('Database/NoClass.json', 'r') as f:

@@ -1,12 +1,7 @@
 import datetime
-import json
-
-from Main.Module.bus_information import *
-from Main.Module.information import *
-from Main.Module.model import *
-from Main.Module.nikodou_information import *
-
-import requests
+from Module.bus_information import *
+from Module.information import *
+from Module.nikodou_information import *
 from flask import Flask, request, abort
 from linebot import (
     LineBotApi, WebhookHandler
@@ -18,7 +13,8 @@ from linebot.models import (
     MessageEvent, TextMessage, TextSendMessage,
 )
 
-from Main.Module import model
+from Module import model
+from Module.model import *
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
