@@ -3,7 +3,7 @@ import os
 from playhouse.db_url import connect
 
 
-url = os.environ('DATABASE_URL')
+url = os.environ['DATABASE_URL']
 db = connect(url)
 
 
