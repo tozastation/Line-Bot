@@ -15,9 +15,11 @@ class Niko(object):
             response = urllib.request.urlopen(self.url_ranking)
         elif category in 'news':
             response = urllib.request.urlopen(self.url_news)
+
         root = ElementTree.fromstring(response.read())
         document = md.parseString(ElementTree.tostring(root, 'utf-8'))
         send_list = []
+
         for a in document.getElementsByTagName(tag):
             send_list.append(a.toxml().rstrip('</'+tag+'>').lstrip('</'+tag+'>'))
 

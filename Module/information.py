@@ -1,19 +1,18 @@
 #!/usr/bin/env python3
 # coding:utf-8
 import json
-
+import os
 import requests
-import settings
 
 
 class Info(object):
     def __init__(self):
-        self.__YOUR_CHANNEL_ACCESS_TOKEN = settings.YOUR_CHANNEL_ACCESS_TOKEN
-        self.__YOUR_CHANNEL_SECRET = settings.YOUR_CHANNEL_SECRET
-        self.__KEY = settings.KEY
-        self.__endpoint = settings.endpoint
-        self.__API_KEY = settings.API_KEY
-        self.__api = settings.api
+        self.__YOUR_CHANNEL_ACCESS_TOKEN = os.environ['YOUR_CHANNEL_ACCESS_TOKEN']
+        self.__YOUR_CHANNEL_SECRET = os.environ['YOUR_CHANNEL_SECRET']
+        self.__DOCOMO_API_KEY = os.environ['DOCOMO_API_KEY']
+        self.__DOCOMO_ENDPOINT = os.environ['DOCOMO_ENDPOINT']
+        self.__WEATHER_API_KEY = os.environ['WEATHER_API_KEY']
+        self.__WEATHER_API = os.environ['WEATHER_API']
 
     def get_ycat(self):
         return self.__YOUR_CHANNEL_ACCESS_TOKEN
@@ -22,16 +21,16 @@ class Info(object):
         return self.__YOUR_CHANNEL_SECRET
 
     def get_key(self):
-        return self.__KEY
+        return self.__DOCOMO_API_KEY
 
     def get_endpoint(self):
-        return self.__endpoint
+        return self.__DOCOMO_ENDPOINT
 
     def get_api_key(self):
-        return self.__API_KEY
+        return self.__WEATHER_API_KEY
 
     def get_api(self):
-        return self.__api
+        return self.__WEATHER_API
 
     def morning_information(self):
         api = self.get_api()
