@@ -149,15 +149,14 @@ def handle_message(event):
     get_no_class_flag = '@noclass'
 
     # テーブル作成
-    db.create_tables([model.UserInfomation], safe=True)
-    db.create_tables([model.LogInfomation], safe=True)
+    db.create_tables([UserInfomation], safe=True)
+    db.create_tables([LogInfomation], safe=True)
     # 送信元ユーザID取得
     user_id = event.source.user_id
     # 送信元テキスト取得
     user_text = event.message.text
     # テーブルから同一ユーザ取得
-    this_user = UserInfomation.get(model.UserInfomation.user_id == user_id)
-
+    this_user = UserInfomation.get(UserInfomation.user_id == user_id)
     # ユーザID取得
     with db.transaction():
         for user in UserInfomation.select():
@@ -165,7 +164,7 @@ def handle_message(event):
                 duplication_flag = True
 
         if duplication_flag is False:
-            model.UserInfomation.create(user_id=user_id)
+            UserInfomation.create(user_id=user_id)
 
     db.commit()
     # ユーザ名登録
@@ -263,7 +262,7 @@ def handle_message(event):
 
         dear = ''
         if not(this_user.user_name is None):
-            dear = 'なんだうさ。'+user.user_name+'さん。\n'
+            dear = 'なんだうさ。'+this_user.user_name+'さん。\n'
         text = dear + str(res_json['utt'])
 
         with db.transaction():
