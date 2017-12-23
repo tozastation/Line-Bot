@@ -1,11 +1,10 @@
 from peewee import *
+import os
+from playhouse.db_url import connect
 
-db = PostgresqlDatabase('dfe7lmrbq8vcjl',
-                        host='ec2-54-225-113-161.compute-1.amazonaws.com',
-                        user='xndkwheicbgvly',
-                        port=5432,
-                        password='9ae7ca11594e986db1415eb470e4af59af9271f348ef573dd975e09d8d28398b'
-                        )
+
+url = os.environ('DATABASE_URL')
+db = connect(url)
 
 
 class BaseModel(Model):
@@ -38,7 +37,3 @@ class NoClass(BaseModel):
     class_name = TextField(null=True)
     class_teacher = TextField(null=True)
     class_target = TextField(null=True)
-
-
-if __name__ == 'main':
-    unittest.main()

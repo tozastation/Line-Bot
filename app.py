@@ -2,6 +2,7 @@ import datetime
 from Module.bus_information import *
 from Module.information import *
 from Module.nikodou_information import *
+from Module.model import *
 from flask import Flask, request, abort
 from linebot import (
     LineBotApi, WebhookHandler
@@ -13,12 +14,11 @@ from linebot.models import (
     MessageEvent, TextMessage, TextSendMessage,
 )
 
-from Module import model
-from Module.model import *
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
 info = Info()
+# トークン
 YOUR_CHANNEL_ACCESS_TOKEN = info.get_ycat()
 YOUR_CHANNEL_SECRET = info.get_ycs()
 line_bot_api = LineBotApi(info.get_ycat())
@@ -59,7 +59,7 @@ def send_morning():
     text = info.morning_information()
 
     with db.transaction():
-        for user in model.get_user_id.select():
+        for user in get_user_id.select():
             try:
                 line_bot_api.push_message(user.user_id,
                                           TextSendMessage(text=text))
@@ -183,7 +183,7 @@ def handle_message(event):
     # コース登録
     elif get_course_flag in user_text:
 
-        with model.db.transaction():
+        with db.transaction():
             user_course = user_text.replace(get_course_flag, '')
             query = UserInfomation.update(user_course=user_course).where(UserInfomation.user_id == user_id)
             query.execute()
@@ -207,7 +207,7 @@ def handle_message(event):
             else:
                 text = '登録してないうさ。'
                 line_bot_api.push_message(this_user.user_id,
-                                              TextSendMessage(text=text))
+                                          TextSendMessage(text=text))
         db.commit()
 
     # @bus
@@ -233,6 +233,7 @@ def handle_message(event):
         r = requests.get('https://damp-shelf-47440.herokuapp.com/weather')
         r.json()
 
+    # 雑談
     else:
         # ドコモAPI
         payload = {
