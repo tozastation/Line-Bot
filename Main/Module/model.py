@@ -1,6 +1,5 @@
 from peewee import *
 
-
 db = PostgresqlDatabase('dfe7lmrbq8vcjl',
                         host='ec2-54-225-113-161.compute-1.amazonaws.com',
                         user='xndkwheicbgvly',
@@ -39,3 +38,7 @@ class NoClass(BaseModel):
     class_name = TextField(null=True)
     class_teacher = TextField(null=True)
     class_target = TextField(null=True)
+
+
+if __name__ == 'main':
+    unittest.main()

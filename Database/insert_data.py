@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # coding:utf-8
-import model
 import json
+
+from Main.Module import model
+
 with model.db.transaction():
     with open('Database/NoClass.json', 'r') as f:
         model.db.create_tables([model.NoClass], safe=True)

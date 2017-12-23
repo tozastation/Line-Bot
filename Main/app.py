@@ -1,10 +1,12 @@
-import json
 import datetime
+import json
+
+from Main.Module.bus_information import *
+from Main.Module.information import *
+from Main.Module.model import *
+from Main.Module.nikodou_information import *
+
 import requests
-import bus_information
-import information
-import model
-import nikonikodouga
 from flask import Flask, request, abort
 from linebot import (
     LineBotApi, WebhookHandler
@@ -16,10 +18,11 @@ from linebot.models import (
     MessageEvent, TextMessage, TextSendMessage,
 )
 
+from Main.Module import model
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
-info = information.Info()
+info = Info()
 YOUR_CHANNEL_ACCESS_TOKEN = info.get_ycat()
 YOUR_CHANNEL_SECRET = info.get_ycs()
 line_bot_api = LineBotApi(YOUR_CHANNEL_ACCESS_TOKEN)
@@ -29,11 +32,11 @@ handler = WebhookHandler(YOUR_CHANNEL_SECRET)
 # バス接近情報
 @app.route('/bus')
 def send_bus():
-    bus = bus_information.BusInfo()
+    bus = BusInfo()
     data_list = bus.send_info()
 
-    with model.db.transaction():
-        for user in model.UserInfomation.select():
+    with db.transaction():
+        for user in UserInfomation.select():
             for data in data_list:
                 late = data[0]
                 type = data[1]
@@ -50,7 +53,7 @@ def send_bus():
                                                   TextSendMessage(text=sentence))
                     except LineBotApiError as e:
                         print(e)
-    model.db.commit()
+    db.commit()
     return 'OK\n'
 
 
@@ -59,26 +62,26 @@ def send_bus():
 def send_morning():
     text = info.morning_information()
 
-    with model.db.transaction():
+    with db.transaction():
         for user in model.get_user_id.select():
             try:
                 line_bot_api.push_message(user.user_id,
                                           TextSendMessage(text=text))
             except LineBotApiError as e:
                     print(e)
-    model.db.commit()
+    db.commit()
     return 'Complete to Send\n'
 
 
 # ニコニコ動画「ニュース」
 @app.route('/nikoniko/news')
 def send_nikoniko_news():
-    niko = nikonikodouga.Niko()
+    niko = Niko()
     titles = niko.send_niko_list('title', 'news')
     links = niko.send_niko_list('link', 'news')
 
-    with model.db.transaction():
-        for user in model.UserInfomation.select():
+    with db.transaction():
+        for user in UserInfomation.select():
             line_bot_api.push_message(user.user_id,
                                       TextSendMessage(text='この時間のニュースうさ。'))
             for i in range(0, 5):
@@ -87,19 +90,19 @@ def send_nikoniko_news():
                                               TextSendMessage(text=titles[i] + '\n' + links[i]))
                 except LineBotApiError as e:
                     print(e)
-    model.db.commit()
+    db.commit()
     return 'Complete to Send\n'
 
 
 # ニコニコ動画「ランキング」
 @app.route('/nikoniko/ranking')
 def send_nikoniko_douga():
-    niko = nikonikodouga.Niko()
+    niko = Niko()
     titles = niko.send_niko_list('title', 'ranking')
     links = niko.send_niko_list('link', 'ranking')
 
-    with model.db.transaction():
-        for user in model.UserInfomation.select():
+    with db.transaction():
+        for user in UserInfomation.select():
             line_bot_api.push_message(user.user_id,
                                       TextSendMessage(text='この時間の動画うさ。'))
             for i in range(0,10):
@@ -108,7 +111,7 @@ def send_nikoniko_douga():
                                               TextSendMessage(text=titles[i]+'\n'+links[i]))
                 except LineBotApiError as e:
                     print(e)
-    model.db.commit()
+    db.commit()
     return 'Complete to Send\n'
 
 
@@ -150,33 +153,33 @@ def handle_message(event):
     get_no_class_flag = '@noclass'
 
     # テーブル作成
-    model.db.create_tables([model.UserInfomation], safe=True)
-    model.db.create_tables([model.LogInfomation], safe=True)
+    db.create_tables([model.UserInfomation], safe=True)
+    db.create_tables([model.LogInfomation], safe=True)
     # 送信元ユーザID取得
     user_id = event.source.user_id
     # 送信元テキスト取得
     user_text = event.message.text
     # テーブルから同一ユーザ取得
-    this_user = model.UserInfomation.get(model.UserInfomation.user_id == user_id)
+    this_user = UserInfomation.get(model.UserInfomation.user_id == user_id)
 
     # ユーザID取得
-    with model.db.transaction():
-        for user in model.UserInfomation.select():
+    with db.transaction():
+        for user in UserInfomation.select():
             if user.user_id in user_id:
                 duplication_flag = True
 
         if duplication_flag is False:
             model.UserInfomation.create(user_id=user_id)
 
-    model.db.commit()
+    db.commit()
     # ユーザ名登録
     if user_name_flag in user_text:
 
-        with model.db.transaction():
+        with db.transaction():
             user_name = user_text.replace(user_name_flag, '')
-            query = model.UserInfomation.update(user_name=user_name).where(model.UserInfomation.user_id == user_id)
+            query = UserInfomation.update(user_name=user_name).where(UserInfomation.user_id == user_id)
             query.execute()
-        model.db.commit()
+        db.commit()
 
         line_bot_api.reply_message(
             event.reply_token,
@@ -187,16 +190,16 @@ def handle_message(event):
 
         with model.db.transaction():
             user_course = user_text.replace(get_course_flag, '')
-            query = model.UserInfomation.update(user_course=user_course).where(model.UserInfomation.user_id == user_id)
+            query = UserInfomation.update(user_course=user_course).where(UserInfomation.user_id == user_id)
             query.execute()
-        model.db.commit()
+        db.commit()
 
     # 休講情報Push
     elif get_no_class_flag in user_text:
 
-        with model.db.transaction():
+        with db.transaction():
             if not (this_user.user_course is None):
-                for no_class in model.NoClass.select():
+                for no_class in NoClass.select():
                     if this_user.user_course in no_class.class_target:
                         line_one = no_class.status
                         line_two = '曜日 : ' + no_class.class_date + '(' + no_class.class_day + ')' + no_class.class_time
@@ -210,7 +213,7 @@ def handle_message(event):
                 text = '登録してないうさ。'
                 line_bot_api.push_message(this_user.user_id,
                                               TextSendMessage(text=text))
-        model.db.commit()
+        db.commit()
 
     # @bus
     elif bus_flag in user_text:
@@ -234,6 +237,7 @@ def handle_message(event):
     elif get_weather_flag in user_text:
         r = requests.get('https://damp-shelf-47440.herokuapp.com/weather')
         r.json()
+
     else:
         # ドコモAPI
         payload = {
@@ -266,16 +270,16 @@ def handle_message(event):
             dear = 'なんだうさ。'+user.user_name+'さん。\n'
         text = dear + str(res_json['utt'])
 
-        with model.db.transaction():
-            model.LogInfomation.create(log_text=user_text,
-                                       log_owner=user_id,
-                                       log_status='Receive',
-                                       log_time=datetime.datetime.today())
-            model.LogInfomation.create(log_text=text,
-                                       log_owner='Bot',
-                                       log_status='Reply',
-                                       log_time=datetime.datetime.today())
-        model.db.commit()
+        with db.transaction():
+            LogInfomation.create(log_text=user_text,
+                                 log_owner=user_id,
+                                 log_status='Receive',
+                                 log_time=datetime.datetime.today())
+            LogInfomation.create(log_text=text,
+                                 log_owner='Bot',
+                                 log_status='Reply',
+                                 log_time=datetime.datetime.today())
+        db.commit()
 
         line_bot_api.reply_message(
             event.reply_token,
